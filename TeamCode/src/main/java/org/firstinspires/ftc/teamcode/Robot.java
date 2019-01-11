@@ -34,9 +34,7 @@ public class Robot {
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
     private TFObjectDetector[] tfods = new TFObjectDetector[3];
 
-    private Robot() {
-
-    }
+    private Robot() {}
 
     public static Robot getInstance() {
         if (instance == null) instance = new Robot();
@@ -72,7 +70,7 @@ public class Robot {
         internalFront.vuforiaLicenseKey = VUFORIA_KEY;
         extern1.vuforiaLicenseKey = VUFORIA_KEY;
         internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         extern1.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
