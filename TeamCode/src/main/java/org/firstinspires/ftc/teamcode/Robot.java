@@ -83,6 +83,16 @@ public class Robot {
         }
     }
 
+    public void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        
+        for (int i = 0; i < cams.length; i++) {
+            TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+            tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
+            tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
+        }
+    }
+
     public void runObjectDetection(CameraOrientation orientation, int cameraIndex, ObjectDetected action) {
         tfods[cameraIndex].activate();
 
@@ -141,20 +151,6 @@ public class Robot {
         }
 
         tfods[cameraIndex].shutdown();
-    }
-
-    public void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-        final String LABEL_GOLD_MINERAL = "Gold Mineral";
-        final String LABEL_SILVER_MINERAL = "Silver Mineral";
-
-        for (int i = 0; i < cams.length; i++) {
-            TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-            tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
-            tfods[i].loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
-        }
     }
 
     public void initGyro(BNO055IMU.AngleUnit angle) {
