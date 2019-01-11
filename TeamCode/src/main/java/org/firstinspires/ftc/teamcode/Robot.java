@@ -85,7 +85,7 @@ public class Robot {
 
     public void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        
+
         for (int i = 0; i < cams.length; i++) {
             TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
             tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
@@ -269,9 +269,7 @@ public class Robot {
 
     public interface ObjectDetected {
         void onLeft();
-
         void onCenter();
-
         void onRight();
     }
 }
