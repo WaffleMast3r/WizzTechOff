@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EasyRobot extends LinearOpMode{
@@ -27,7 +28,7 @@ public abstract class EasyRobot extends LinearOpMode{
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLiftUp, extendLiftDown;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLift;
     private ServoFromDcMotor collectorMotor;
     private CRServo collectorServo;
     private BNO055IMU imu;
@@ -57,12 +58,8 @@ public abstract class EasyRobot extends LinearOpMode{
         rightMotorUp = new WizzTechDcMotor(opMode,"m2");
         leftMotorDown = new WizzTechDcMotor(opMode,"m3");
         rightMotorDown = new WizzTechDcMotor(opMode,"m4");
-//
-//        extendLiftUp = new WizzTechDcMotor("m5");
-//        extendLiftDown = new WizzTechDcMotor("m6");
 
-//        initGyro(BNO055IMU.AngleUnit.DEGREES);
-//        initVuforia();
+        extendLift = new WizzTechDcMotor(opMode,"m5");
     }
 
     public void initVuforia() {
@@ -238,12 +235,8 @@ public abstract class EasyRobot extends LinearOpMode{
         this.side = side;
     }
 
-    public WizzTechDcMotor getExtendLiftUp() {
-        return extendLiftUp;
-    }
-
-    public WizzTechDcMotor getExtendLiftDown() {
-        return extendLiftDown;
+    public WizzTechDcMotor getExtendLift() {
+        return extendLift;
     }
 
     public VuforiaLocalizer getVuforia(int index) {
