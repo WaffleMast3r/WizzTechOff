@@ -10,7 +10,7 @@ public abstract class ServoFromDcMotor extends WizzTechDcMotor {
     private int currentPosition = 0;
 
     public ServoFromDcMotor(String name, DcMotor motor) {
-        super(name);
+        super(null,name);
         positions = setPositions();
     }
 

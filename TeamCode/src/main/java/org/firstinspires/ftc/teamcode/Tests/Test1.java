@@ -16,14 +16,14 @@ public class Test1 extends LinearOpMode {
         waitForStart();
 
         // daca update = true; si nu avem parametrii ca in exemplul urmator atunci o sa se updateze doar motorul curent
-        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 100, 1.0, false);
-        MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 200, 1.0, false);
-        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 300, 1.0, false);
-        MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 400, 1.0, false);
+        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 100, 0.5, false);
+        MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 100, 0.5, false);
+        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 100, 0.5, false);
+        MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 100, 0.5, false);
         MotorEncoderController.getInstance().update("m1", "m2", "m3", "m4");
-        Robot.getInstance().getCollectorServo().setPower(1.0);
+//        Robot.getInstance().getCollectorServo().setPower(1.0);
         sleep(20000);
-        Robot.getInstance().getCollectorServo().setPower(0.0);
+//        Robot.getInstance().getCollectorServo().setPower(0.0);
 //        // daca update = true; atunci o sa updateze motoarele care pot fii date ca parametrii in continuare (m1 este numele definit in robot configuration)
 //        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 1, 0.5, true, "m1");
 //        MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 1, 0.6, true, "m1", "m2", "m3", "m4");

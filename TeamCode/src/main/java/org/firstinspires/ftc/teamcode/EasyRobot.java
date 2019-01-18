@@ -53,16 +53,16 @@ public abstract class EasyRobot extends LinearOpMode{
         this.hardwareMap = opMode.hardwareMap;
         //Init of the chassis motor
         //modificare suspicioasa
-//        leftMotorUp = new WizzTechDcMotor("m1");
-//        rightMotorUp = new WizzTechDcMotor("m2");
-//        leftMotorDown = new WizzTechDcMotor("m3");
-//        rightMotorDown = new WizzTechDcMotor("m4");
+        leftMotorUp = new WizzTechDcMotor(opMode,"m1");
+        rightMotorUp = new WizzTechDcMotor(opMode,"m2");
+        leftMotorDown = new WizzTechDcMotor(opMode,"m3");
+        rightMotorDown = new WizzTechDcMotor(opMode,"m4");
 //
 //        extendLiftUp = new WizzTechDcMotor("m5");
 //        extendLiftDown = new WizzTechDcMotor("m6");
 
 //        initGyro(BNO055IMU.AngleUnit.DEGREES);
-        initVuforia();
+//        initVuforia();
     }
 
     public void initVuforia() {
@@ -75,7 +75,7 @@ public abstract class EasyRobot extends LinearOpMode{
         extern1.vuforiaLicenseKey = VUFORIA_KEY;
 //        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 //        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam1");
+        extern1.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
 //        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
 //        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);

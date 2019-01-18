@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
+import org.firstinspires.ftc.teamcode.MotorEncoderController;
 
 @Autonomous(name = "Test 5", group = "tests")
 public class Test5 extends EasyRobot {
@@ -14,23 +15,13 @@ public class Test5 extends EasyRobot {
 
         waitForStart();
 
-        runObjectDetection(CameraOrientation.PORTRAIT, 2, new ObjectDetected() {
-            @Override
-            public void onLeft(int... values) {
-                
-            }
-
-            @Override
-            public void onCenter(int... values) {
-
-            }
-
-            @Override
-            public void onRight(int... values) {
-
-            }
-        });
-
+        MotorEncoderController.getInstance().drive(getLeftMotorUp(), 10, 0.5, false);
+        MotorEncoderController.getInstance().drive(getRightMotorUp(), 10, 0.5, false);
+        MotorEncoderController.getInstance().drive(getLeftMotorDown(), 10, 0.5, false);
+        MotorEncoderController.getInstance().drive(getRightMotorDown(), 10, 0.5, false);
+        MotorEncoderController.getInstance().update("m1","m2","m3","m4");
+        sleep(4000);
+        MotorEncoderController.disable();
         disable();
     }
 }

@@ -40,7 +40,7 @@ public class Mode1 extends LinearOpMode {
             @Override
             public void onRight(int... values) {
                 // TODO: 1/11/2019 Turn right and forward or go sideways towards right
-                telemetry.addData("Found", "Center (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
+                telemetry.addData("Found", "Right (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
                 telemetry.update();
                 sleep(10000);
             }
