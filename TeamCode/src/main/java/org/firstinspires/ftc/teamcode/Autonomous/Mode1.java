@@ -11,30 +11,45 @@ public class Mode1 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot.getInstance().init(hardwareMap);
+        Robot.getInstance().init(this);
 
         waitForStart();
 
         Robot.getInstance().runObjectDetection(Robot.CameraOrientation.PORTRAIT, 2, new Robot.ObjectDetected() {
             @Override
-            public void onLeft() {
+            public void onLeft(int... values) {
                 // TODO: 1/11/2019 Turn left and forward or go sideways towards left
+                telemetry.addData("Found", "Left (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
+                telemetry.update();
+                sleep(10000);
             }
 
             @Override
-            public void onCenter() {
-                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 10, 1.0, false);
-                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
-                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
-                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
-                MotorEncoderController.getInstance().update("*");
+            public void onCenter(int... values) {
+//                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 10, 1.0, false);
+//                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
+//                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
+//                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
+//                MotorEncoderController.getInstance().update("*");
+
+                telemetry.addData("Found", "Center (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
+                telemetry.update();
+                sleep(10000);
             }
 
             @Override
-            public void onRight() {
+            public void onRight(int... values) {
                 // TODO: 1/11/2019 Turn right and forward or go sideways towards right
+                telemetry.addData("Found", "Center (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
+                telemetry.update();
+                sleep(10000);
             }
         });
+
+        telemetry.addData("Finished", "Done");
+        telemetry.update();
+
+        sleep(10000);
 
         MotorEncoderController.disable();
         Robot.disable();

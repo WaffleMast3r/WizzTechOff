@@ -7,13 +7,12 @@ import android.view.ViewGroup;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.vuforia.Frame;
 
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
-//import org.opencv.android.OpenCVLoader;
 
 @Autonomous(name = "Test 2 - OpenCV", group = "tests")
 public class Test2 extends LinearOpMode {
@@ -24,34 +23,28 @@ public class Test2 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         OpenCVLoader.loadOpenCV();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        VideoCapture cap = new VideoCapture();
-        Mat frame = new Mat();
-        cap.read(frame);
-        Frame currentFrame = new Frame();
-        View view = new sub(hardwareMap.appContext, 0).getView();
-
-
-        setCurrentView(hardwareMap.appContext, view);
-
+        telemetry.addData("OpenCV", OpenCVLoader.initDebug());
+        telemetry.update();
 
         waitForStart();
+        VideoCapture cap = new VideoCapture();
+        Mat frame = new Mat();
+//        try{
+//            cap.open(0);
+//            cap.read(frame);
+//        } catch (Exception e){
+//            telemetry.addData("Err", e.getMessage());
+//            telemetry.update();
+//        }
 
-        telemetry.addData("OpenCv Loaded", OpenCVLoader.initDebug());
-        telemetry.update();
+
+//        Imgcodecs.imwrite("/storage/emulated/0/DCIM/Camera", frame);
+//        cap.release();
 
         //Robot.disable();
         //MotorEncoderController.disable();
-    }
-
-    private class sub extends JavaCameraView {
-        public sub(Context context, int cameraId) {
-            super(context, cameraId);
-        }
-
-        public View getView() {
-            return findViewById(android.R.id.content);
-        }
     }
 
     public void setCurrentView(Context context, View newView) {
@@ -71,5 +64,15 @@ public class Test2 extends LinearOpMode {
                 view = queuedView;                  //Update current view
             }
         });
+    }
+
+    private class sub extends JavaCameraView {
+        public sub(Context context, int cameraId) {
+            super(context, cameraId);
+        }
+
+        public View getView() {
+            return findViewById(android.R.id.content);
+        }
     }
 }

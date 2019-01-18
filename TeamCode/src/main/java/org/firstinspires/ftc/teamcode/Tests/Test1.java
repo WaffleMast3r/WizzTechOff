@@ -11,7 +11,7 @@ public class Test1 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //am facut o clasa in care initializam robotul si vreau acum sa modific ceva la ea
-        Robot.getInstance().init(hardwareMap);
+        Robot.getInstance().init(this);
 
         waitForStart();
 

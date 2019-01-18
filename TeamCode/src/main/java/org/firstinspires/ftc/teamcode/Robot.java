@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -24,6 +25,8 @@ public class Robot {
     private static final String VUFORIA_KEY = "Ae1B0KT/////AAAAmb1XYh8lnkJApASHU4GlfoqG1HM2p/vcZ5IxoIMZChOo2PH0w70nDnGNquAykLVE1+9dA+dH8LGl5G1s0ts72YIhfH7FShO4GtIjsIkf8Sgolfi3qdzfQ+t0ga1a90ISGY3ZxKFoz6M6I8URFSPwju493j1WM73/xTwIWyMy3SSgz8O0S+MSrYTUG8e97iY3RLcH6OefPQNWzvH9Lh8+rxnjwR9RR40WHD/Oefh83kN7EanocJi/PUxTc+zAlfrcurVQCUTOd3yHlZeFtrZ9zVMgPZ/p9RKYK+/gUKYmmdBALrtjkFC6YI6XPRgCUnVZU9QP6DWj7XKT93PDRlaSvmhBztDG+GGGb9/Vu2Hwbg5b";
 
     private static Robot instance = null;
+    private static TFObjectDetector[] tfods = new TFObjectDetector[3];
+    private LinearOpMode opMode;
     private HardwareMap hardwareMap;
     private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLiftUp, extendLiftDown;
     private ServoFromDcMotor collectorMotor;
@@ -32,9 +35,9 @@ public class Robot {
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
-    private TFObjectDetector[] tfods = new TFObjectDetector[3];
 
-    private Robot() {}
+    private Robot() {
+    }
 
     public static Robot getInstance() {
         if (instance == null) instance = new Robot();
@@ -42,39 +45,46 @@ public class Robot {
     }
 
     public static void disable() {
+        for (int i = 0; i < tfods.length; i++) {
+            if (tfods[i] != null) {
+                tfods[i].shutdown();
+            }
+
+        }
         instance = null;
     }
 
-    public void init(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
+    public void init(LinearOpMode opMode) {
+        this.opMode = opMode;
+        this.hardwareMap = opMode.hardwareMap;
         //Init of the chassis motor
         //modificare suspicioasa
-        leftMotorUp = new WizzTechDcMotor("m1");
-        rightMotorUp = new WizzTechDcMotor("m2");
-        leftMotorDown = new WizzTechDcMotor("m3");
-        rightMotorDown = new WizzTechDcMotor("m4");
+//        leftMotorUp = new WizzTechDcMotor("m1");
+//        rightMotorUp = new WizzTechDcMotor("m2");
+//        leftMotorDown = new WizzTechDcMotor("m3");
+//        rightMotorDown = new WizzTechDcMotor("m4");
+//
+//        extendLiftUp = new WizzTechDcMotor("m5");
+//        extendLiftDown = new WizzTechDcMotor("m6");
 
-        extendLiftUp = new WizzTechDcMotor("m5");
-        extendLiftDown = new WizzTechDcMotor("m6");
-
-        initGyro(BNO055IMU.AngleUnit.DEGREES);
+//        initGyro(BNO055IMU.AngleUnit.DEGREES);
         initVuforia();
     }
 
     public void initVuforia() {
-        VuforiaLocalizer.Parameters internalBack = new VuforiaLocalizer.Parameters();
-        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
+//        VuforiaLocalizer.Parameters internalBack = new VuforiaLocalizer.Parameters();
+//        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
         VuforiaLocalizer.Parameters extern1 = new VuforiaLocalizer.Parameters();
 
-        internalBack.vuforiaLicenseKey = VUFORIA_KEY;
-        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
+//        internalBack.vuforiaLicenseKey = VUFORIA_KEY;
+//        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
         extern1.vuforiaLicenseKey = VUFORIA_KEY;
-        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        extern1.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+//        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+//        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam1");
 
-        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
-        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
+//        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
+//        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
         cams[2] = ClassFactory.getInstance().createVuforia(extern1);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
@@ -87,70 +97,58 @@ public class Robot {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         for (int i = 0; i < cams.length; i++) {
-            TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-            tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
-            tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
+            if (cams[i] != null) {
+                TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+                tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
+                tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
+            }
         }
     }
 
     public void runObjectDetection(CameraOrientation orientation, int cameraIndex, ObjectDetected action) {
-        tfods[cameraIndex].activate();
-
-        List<Recognition> updatedRecognitions = tfods[cameraIndex].getUpdatedRecognitions();
-        if (updatedRecognitions != null) {
-            if (updatedRecognitions.size() == 3) {
-                int goldMineralX = -1;
-                int silverMineral1X = -1;
-                int silverMineral2X = -1;
-                for (Recognition recognition : updatedRecognitions) {
-                    switch (orientation) {
-                        case PORTRAIT:
-                            if (recognition.getLabel().equals("Gold Mineral")) {
-                                goldMineralX = (int) recognition.getLeft();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getLeft();
-                            } else {
-                                silverMineral2X = (int) recognition.getLeft();
-                            }
-                        case LANDSCAPE:
-                            if (recognition.getLabel().equals("Gold Mineral")) {
-                                goldMineralX = (int) recognition.getTop();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getTop();
-                            } else {
-                                silverMineral2X = (int) recognition.getTop();
-                            }
-                        case PORTRAIT_FLIPPED:
-                            if (recognition.getLabel().equals("Gold Mineral")) {
-                                goldMineralX = (int) recognition.getRight();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getRight();
-                            } else {
-                                silverMineral2X = (int) recognition.getRight();
-                            }
-                        case LANDSCAPE_FLIPPED:
-                            if (recognition.getLabel().equals("Gold Mineral")) {
-                                goldMineralX = (int) recognition.getBottom();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getBottom();
-                            } else {
-                                silverMineral2X = (int) recognition.getBottom();
-                            }
+        TFObjectDetector tf = tfods[cameraIndex];
+        tf.activate();
+        int[] positions = new int[3];
+        while (opMode.opModeIsActive()) {
+            List<Recognition> updatedRecognitions = tf.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                if (updatedRecognitions.size() == 3) {
+                    int goldMineralX = -1;
+                    int silverMineral1X = -1;
+                    int silverMineral2X = -1;
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals("Gold Mineral")) {
+                            goldMineralX = (int) recognition.getLeft();
+                        } else if (silverMineral1X == -1) {
+                            silverMineral1X = (int) recognition.getLeft();
+                        } else {
+                            silverMineral2X = (int) recognition.getLeft();
+                        }
                     }
-                }
-                if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                    if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                        action.onLeft();
-                    } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                        action.onRight();
-                    } else {
-                        action.onCenter();
+                    if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                        if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                            if (positions[0]++ == 10) {
+                                action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
+                                tf.shutdown();
+                                return;
+                            }
+                        } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                            if (positions[2]++ == 10) {
+                                action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
+                                tf.shutdown();
+                                return;
+                            }
+                        } else {
+                            if (positions[1]++ == 10) {
+                                action.onCenter(goldMineralX, silverMineral1X, silverMineral2X);
+                                tf.shutdown();
+                                return;
+                            }
+                        }
                     }
                 }
             }
         }
-
-        tfods[cameraIndex].shutdown();
     }
 
     public void initGyro(BNO055IMU.AngleUnit angle) {
@@ -177,6 +175,37 @@ public class Robot {
             default:
                 return 0;
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void turnTo(Axis axis, double power, int degrees) throws InterruptedException {
+
+        double angle = getAngle(axis);
+        while (Math.abs(angle - degrees) > 0) {
+            if (angle > degrees) {
+                getLeftMotorUp().getMotor().setPower(power);
+                getRightMotorUp().getMotor().setPower(power);
+                getLeftMotorDown().getMotor().setPower(power);
+                getRightMotorDown().getMotor().setPower(power);
+            } else if (angle < degrees) {
+                getLeftMotorUp().getMotor().setPower(-power);
+                getRightMotorUp().getMotor().setPower(-power);
+                getLeftMotorDown().getMotor().setPower(-power);
+                getRightMotorDown().getMotor().setPower(-power);
+            }
+            opMode.waitOneFullHardwareCycle();
+        }
+
+        opMode.waitOneFullHardwareCycle();
+        getLeftMotorUp().getMotor().setPower(0.01);
+        getRightMotorUp().getMotor().setPower(0.01);
+        getLeftMotorDown().getMotor().setPower(0.01);
+        getRightMotorDown().getMotor().setPower(0.01);
+        opMode.sleep(500);
+        getLeftMotorUp().getMotor().setPower(0);
+        getRightMotorUp().getMotor().setPower(0);
+        getLeftMotorDown().getMotor().setPower(0);
+        getRightMotorDown().getMotor().setPower(0);
     }
 
     public WizzTechDcMotor getLeftMotorUp() {
@@ -268,8 +297,10 @@ public class Robot {
     }
 
     public interface ObjectDetected {
-        void onLeft();
-        void onCenter();
-        void onRight();
+        void onLeft(int... values);
+
+        void onCenter(int... values);
+
+        void onRight(int... values);
     }
 }

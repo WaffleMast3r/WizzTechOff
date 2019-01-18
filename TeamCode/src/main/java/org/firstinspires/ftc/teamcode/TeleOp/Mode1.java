@@ -14,7 +14,7 @@ public class Mode1 extends LinearOpMode {
 
         boolean frana = false;
 
-        Robot.getInstance().init(hardwareMap);
+        Robot.getInstance().init(this);
 
         waitForStart();
 

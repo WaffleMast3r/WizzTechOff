@@ -13,7 +13,7 @@ public class Mode2 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Robot.getInstance().init(hardwareMap);
+        Robot.getInstance().init(this);
 
         double angle;
         double left_stick_x, left_stick_y, right_stick_x;

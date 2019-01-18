@@ -129,11 +129,11 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
                             }
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Left");
+                                    telemetry.addData("Found", "Left (" + goldMineralX + ", " + silverMineral1X + ", " + silverMineral2X + ")");
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Right");
+                                    telemetry.addData("Found", "Center (" + goldMineralX + ", " + silverMineral1X + ", " + silverMineral2X + ")");
                                 } else {
-                                    telemetry.addData("Gold Mineral Position", "Center");
+                                    telemetry.addData("Found", "Right (" + goldMineralX + ", " + silverMineral1X + ", " + silverMineral2X + ")");
                                 }
                             }
                         }
