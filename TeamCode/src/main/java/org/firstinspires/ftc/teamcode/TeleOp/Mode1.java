@@ -3,11 +3,14 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.teamcode.MotorEncoderController;
 import org.firstinspires.ftc.teamcode.Robot;
 
 @TeleOp(name = "Tele Op V1", group = "Official")
 public class Mode1 extends LinearOpMode {
+
+    public final double SERVO_POS_1 = 1, SERVO_POS_2 = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -20,20 +23,16 @@ public class Mode1 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if (Math.abs(gamepad1.left_trigger) > 0.05) {
-                Robot.getInstance().getExtendLiftUp().getMotor().setPower(gamepad1.left_trigger);
-                Robot.getInstance().getExtendLiftDown().getMotor().setPower(gamepad1.left_trigger);
+            if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+                Robot.getInstance().getLiftMotor().getMotor().setPower(gamepad2.left_stick_y);
             } else {
-                Robot.getInstance().getExtendLiftUp().getMotor().setPower(0.01);
-                Robot.getInstance().getExtendLiftDown().getMotor().setPower(0.01);
+                Robot.getInstance().getLiftMotor().getMotor().setPower(0.01);
             }
 
-            if (Math.abs(gamepad1.right_trigger) > 0.05) {
-                Robot.getInstance().getExtendLiftUp().getMotor().setPower(-gamepad1.right_trigger);
-                Robot.getInstance().getExtendLiftDown().getMotor().setPower(-gamepad1.right_trigger);
+            if (gamepad2.a) {
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
             } else {
-                Robot.getInstance().getExtendLiftUp().getMotor().setPower(0.01);
-                Robot.getInstance().getExtendLiftDown().getMotor().setPower(0.01);
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
             }
 
             if (gamepad1.x || gamepad1.dpad_left) {

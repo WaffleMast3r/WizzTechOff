@@ -27,6 +27,22 @@ public class MotorEncoderController {
         instance = null;
     }
 
+    public void waitForMotors(String... names){
+        if (names.length == 1){
+            if (names[0].equalsIgnoreCase("*") || names[0].equalsIgnoreCase("all")){
+                while (!running.isEmpty()){}
+            }else{
+                for (String name : names){
+                    while (running.get(name) != null){}
+                }
+            }
+        }else if (names.length > 1){
+            for (String name : names){
+                while (running.get(name) != null){}
+            }
+        }
+    }
+
     public synchronized void drive(final WizzTechDcMotor motor, final int distance, final double speed, boolean update, String... names) {
         try {
             queued.put(motor.getName(), new Thread(new Runnable() {

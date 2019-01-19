@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -28,14 +29,13 @@ public class Robot {
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLiftUp, extendLiftDown;
-    private ServoFromDcMotor collectorMotor;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, liftMotor;
     private CRServo collectorServo;
+    private Servo collectorPivotServo;
     private BNO055IMU imu;
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
-
     private Robot() {
     }
 
@@ -49,7 +49,6 @@ public class Robot {
             if (tfods[i] != null) {
                 tfods[i].shutdown();
             }
-
         }
         instance = null;
     }
@@ -58,17 +57,15 @@ public class Robot {
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
         //Init of the chassis motor
-        //modificare suspicioasa
-        leftMotorUp = new WizzTechDcMotor(opMode,"m1");
-        rightMotorUp = new WizzTechDcMotor(opMode,"m2");
-        leftMotorDown = new WizzTechDcMotor(opMode,"m3");
-        rightMotorDown = new WizzTechDcMotor(opMode,"m4");
-//
-//        extendLiftUp = new WizzTechDcMotor("m5");
-//        extendLiftDown = new WizzTechDcMotor("m6");
+        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
+        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
+        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
+        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
 
-//        initGyro(BNO055IMU.AngleUnit.DEGREES);
-//        initVuforia();
+        liftMotor = new WizzTechDcMotor(opMode, "m5");
+
+        collectorServo = hardwareMap.crservo.get("s1");
+        collectorPivotServo = hardwareMap.servo.get("s2");
     }
 
     public void initVuforia() {
@@ -229,10 +226,6 @@ public class Robot {
         return extendCollectorMotorArm;
     }
 
-    public WizzTechDcMotor getCollectorMotor() {
-        return collectorMotor;
-    }
-
     public CRServo getCollectorServo() {
         return collectorServo;
     }
@@ -245,12 +238,12 @@ public class Robot {
         this.side = side;
     }
 
-    public WizzTechDcMotor getExtendLiftUp() {
-        return extendLiftUp;
+    public WizzTechDcMotor getLiftMotor() {
+        return liftMotor;
     }
 
-    public WizzTechDcMotor getExtendLiftDown() {
-        return extendLiftDown;
+    public Servo getCollectorPivotServo() {
+        return collectorPivotServo;
     }
 
     public VuforiaLocalizer getVuforia(int index) {
