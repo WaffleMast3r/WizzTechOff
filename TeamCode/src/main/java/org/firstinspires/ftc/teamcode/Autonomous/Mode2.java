@@ -17,7 +17,7 @@ public class Mode2 extends EasyRobot {
         init();
         initGyro(BNO055IMU.AngleUnit.DEGREES);
         getExtendLift().getMotor().setPower(0.01);
-        initVuforia();
+        //initVuforia();
 
         waitForStart();
 
@@ -28,7 +28,7 @@ public class Mode2 extends EasyRobot {
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 4, -0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 4, 0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 4, 0.5, false);
-        MotorEncoderController.getInstance().update("*");
+        MotorEncoderController.getInstance().update("m1","m2","m3","m4");
         sleep(4000);
 
         //Drive putin inainte
@@ -36,7 +36,7 @@ public class Mode2 extends EasyRobot {
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 3, -0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 3, 0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 3, -0.5, false);
-        MotorEncoderController.getInstance().update("*");
+        MotorEncoderController.getInstance().update("m1","m2","m3","m4");
         sleep(2000);
 
         //Drive dreapta
@@ -44,7 +44,7 @@ public class Mode2 extends EasyRobot {
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 4, 0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 4, -0.5, false);
         MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 4, -0.5, false);
-        MotorEncoderController.getInstance().update("*");
+        MotorEncoderController.getInstance().update("m1","m2","m3","m4");
         sleep(4000);
 
         runObjectDetection(CameraOrientation.PORTRAIT, 2, new ObjectDetected() {
@@ -64,7 +64,7 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 0.9, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
             }
 
             @Override
@@ -73,7 +73,7 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
 
                 telemetry.addData("Found", "Center (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
                 telemetry.update();
@@ -83,7 +83,7 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 7, -1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 7, 1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 7, -1.0, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
             }
 
             @Override
@@ -92,7 +92,7 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 0.7, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
 
                 telemetry.addData("Found", "Right (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
                 telemetry.update();
@@ -102,7 +102,7 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -0.9, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
                 MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -0.9, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
             }
         });
 
