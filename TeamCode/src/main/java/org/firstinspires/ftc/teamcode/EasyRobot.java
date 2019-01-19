@@ -25,7 +25,6 @@ import java.util.List;
 public abstract class EasyRobot extends LinearOpMode{
 
     private static final String VUFORIA_KEY = "Ae1B0KT/////AAAAmb1XYh8lnkJApASHU4GlfoqG1HM2p/vcZ5IxoIMZChOo2PH0w70nDnGNquAykLVE1+9dA+dH8LGl5G1s0ts72YIhfH7FShO4GtIjsIkf8Sgolfi3qdzfQ+t0ga1a90ISGY3ZxKFoz6M6I8URFSPwju493j1WM73/xTwIWyMy3SSgz8O0S+MSrYTUG8e97iY3RLcH6OefPQNWzvH9Lh8+rxnjwR9RR40WHD/Oefh83kN7EanocJi/PUxTc+zAlfrcurVQCUTOd3yHlZeFtrZ9zVMgPZ/p9RKYK+/gUKYmmdBALrtjkFC6YI6XPRgCUnVZU9QP6DWj7XKT93PDRlaSvmhBztDG+GGGb9/Vu2Hwbg5b";
-
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
@@ -78,7 +77,7 @@ public abstract class EasyRobot extends LinearOpMode{
 //        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
         cams[2] = ClassFactory.getInstance().createVuforia(extern1);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
+//            initTfod();
         } else {
             System.err.println("Cannot init tfod");
         }
