@@ -37,6 +37,12 @@ public class Mode1 extends LinearOpMode {
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
             }
 
+            if (gamepad2.x){
+                Robot.getInstance().getCollectorServo().setPower(1);
+            }else if (gamepad2.b){
+                Robot.getInstance().getCollectorServo().setPower(0);
+            }
+
             if (gamepad1.x || gamepad1.dpad_left) {
                 Robot.getInstance().getLeftMotorUp().getMotor().setPower(-0.1);
                 Robot.getInstance().getRightMotorUp().getMotor().setPower(0.1);
