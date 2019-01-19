@@ -11,7 +11,7 @@ public class Test5 extends EasyRobot {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        init(this);
+        initRobot(this);
 
         waitForStart();
 
