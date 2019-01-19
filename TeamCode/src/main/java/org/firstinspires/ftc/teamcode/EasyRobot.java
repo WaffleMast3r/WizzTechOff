@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -29,8 +30,8 @@ public abstract class EasyRobot extends LinearOpMode{
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
     private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLift;
-    private ServoFromDcMotor collectorMotor;
     private CRServo collectorServo;
+    private Servo collectorRotateServo;
     private BNO055IMU imu;
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
@@ -45,11 +46,10 @@ public abstract class EasyRobot extends LinearOpMode{
             if (tfods[i] != null) {
                 tfods[i].shutdown();
             }
-
         }
     }
 
-    public void init(LinearOpMode opMode) {
+    public void initRobot(LinearOpMode opMode) {
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
         //Init of the chassis motor
@@ -217,10 +217,6 @@ public abstract class EasyRobot extends LinearOpMode{
 
     public WizzTechDcMotor getExtendCollectorMotorArm() {
         return extendCollectorMotorArm;
-    }
-
-    public WizzTechDcMotor getCollectorMotor() {
-        return collectorMotor;
     }
 
     public CRServo getCollectorServo() {

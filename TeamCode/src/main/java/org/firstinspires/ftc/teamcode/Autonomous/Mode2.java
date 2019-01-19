@@ -14,7 +14,7 @@ public class Mode2 extends EasyRobot {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        init();
+        initRobot(this);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
         getExtendLift().getMotor().setPower(0.01);
         //initVuforia();
