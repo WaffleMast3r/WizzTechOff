@@ -23,25 +23,22 @@ public class Mode1 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                Robot.getInstance().getLiftMotor().getMotor().setPower(gamepad2.left_stick_y);
-            } else {
-                Robot.getInstance().getLiftMotor().getMotor().setPower(0.01);
-            }
+            Robot.getInstance().getLiftMotor1().getMotor().setPower(gamepad1.right_trigger);
+            Robot.getInstance().getLiftMotor2().getMotor().setPower(gamepad1.left_trigger);
 
-            if (gamepad2.a) {
-                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
-            } else if (gamepad2.y) {
-                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_3);
-            } else {
-                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
-            }
+//            if (gamepad2.a) {
+//                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
+//            } else if (gamepad2.y) {
+//                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_3);
+//            } else {
+//                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
+//            }
 
-            if (gamepad2.x){
-                Robot.getInstance().getCollectorServo().setPower(1);
-            }else if (gamepad2.b){
-                Robot.getInstance().getCollectorServo().setPower(0);
-            }
+//            if (gamepad2.x){
+//                Robot.getInstance().getCollectorServo().setPower(1);
+//            }else if (gamepad2.b){
+//                Robot.getInstance().getCollectorServo().setPower(0);
+//            }
 
             if (gamepad1.x || gamepad1.dpad_left) {
                 Robot.getInstance().getLeftMotorUp().getMotor().setPower(-0.1);

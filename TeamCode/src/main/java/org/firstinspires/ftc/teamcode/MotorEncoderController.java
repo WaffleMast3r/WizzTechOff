@@ -8,7 +8,7 @@ public class MotorEncoderController {
 
     private static MotorEncoderController instance = null;
     private int TICKS_PER_REVOLUTION = 575;
-    private double COUNTS_PER_INCH = TICKS_PER_REVOLUTION / 3;   //16.5 // TODO: 12/1/2018 Change here
+    private double COUNTS_PER_INCH = TICKS_PER_REVOLUTION / 5;   //16.5 // TODO: 12/1/2018 Change here
     private HashMap<String, Thread> queued = new HashMap<>();
     private HashMap<String, Thread> running = new HashMap<>();
     private boolean emergencyStop = false;

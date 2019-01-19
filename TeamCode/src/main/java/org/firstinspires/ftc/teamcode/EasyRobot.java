@@ -118,13 +118,13 @@ public abstract class EasyRobot extends LinearOpMode{
                     if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                         if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                             if (positions[0]++ == 10) {
-                                action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
+                                action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
                                 tf.shutdown();
                                 return;
                             }
                         } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                             if (positions[2]++ == 10) {
-                                action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
+                                action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
                                 tf.shutdown();
                                 return;
                             }

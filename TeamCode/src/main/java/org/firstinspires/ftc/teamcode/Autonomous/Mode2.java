@@ -48,14 +48,15 @@ public class Mode2 extends EasyRobot {
         MotorEncoderController.getInstance().update("m1","m2","m3","m4");
         sleep(4000);
 
-        runObjectDetection(CameraOrientation.PORTRAIT, 2, new ObjectDetected() {
+        runObjectDetection(CameraOrientation.PORTRAIT
+                , 2, new ObjectDetected() {
             @Override
             public void onLeft(int... values) {
                 MotorEncoderController.getInstance().drive(getLeftMotorUp(), 15, 1.0, false);
-                MotorEncoderController.getInstance().drive(getRightMotorUp(), 15, -0.7, false);
+                MotorEncoderController.getInstance().drive(getRightMotorUp(), 15, -0.8, false);
                 MotorEncoderController.getInstance().drive(getLeftMotorDown(), 15, 1.0, false);
-                MotorEncoderController.getInstance().drive(getRightMotorDown(), 15, -0.7, false);
-                MotorEncoderController.getInstance().update("*");
+                MotorEncoderController.getInstance().drive(getRightMotorDown(), 15, -0.8, false);
+                MotorEncoderController.getInstance().update("m1","m2","m3","m4");
 
                 telemetry.addData("Found", "Left (" + values[0] + ", " + values[1] + ", " + values[2] + ")");
                 telemetry.update();
@@ -89,9 +90,9 @@ public class Mode2 extends EasyRobot {
 
             @Override
             public void onRight(int... values) {
-                MotorEncoderController.getInstance().drive(getLeftMotorUp(), 10, 0.7, false);
+                MotorEncoderController.getInstance().drive(getLeftMotorUp(), 10, 0.8, false);
                 MotorEncoderController.getInstance().drive(getRightMotorUp(), 10, -1.0, false);
-                MotorEncoderController.getInstance().drive(getLeftMotorDown(), 10, 0.7, false);
+                MotorEncoderController.getInstance().drive(getLeftMotorDown(), 10, 0.8, false);
                 MotorEncoderController.getInstance().drive(getRightMotorDown(), 10, -1.0, false);
                 MotorEncoderController.getInstance().update("m1","m2","m3","m4");
 

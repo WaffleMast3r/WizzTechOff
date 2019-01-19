@@ -29,7 +29,7 @@ public class Robot {
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, liftMotor;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, liftMotor1, liftMotor2;
     private CRServo collectorServo;
     private Servo collectorPivotServo;
     private BNO055IMU imu;
@@ -62,7 +62,8 @@ public class Robot {
         leftMotorDown = new WizzTechDcMotor(opMode, "m3");
         rightMotorDown = new WizzTechDcMotor(opMode, "m4");
 
-        liftMotor = new WizzTechDcMotor(opMode, "m5");
+        liftMotor1 = new WizzTechDcMotor(opMode, "m5");
+        liftMotor2 = new WizzTechDcMotor(opMode, "m6");
 
         collectorServo = hardwareMap.crservo.get("s1");
         collectorPivotServo = hardwareMap.servo.get("s2");
@@ -238,8 +239,12 @@ public class Robot {
         this.side = side;
     }
 
-    public WizzTechDcMotor getLiftMotor() {
-        return liftMotor;
+    public WizzTechDcMotor getLiftMotor1() {
+        return liftMotor1;
+    }
+
+    public WizzTechDcMotor getLiftMotor2() {
+        return liftMotor2;
     }
 
     public Servo getCollectorPivotServo() {
