@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot;
 @TeleOp(name = "Tele Op V1", group = "Official")
 public class Mode1 extends LinearOpMode {
 
-    public final double SERVO_POS_1 = 1, SERVO_POS_2 = 0;
+    public final double SERVO_POS_1 = 1, SERVO_POS_2 = 0, SERVO_POS_3 = 0.5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -31,6 +31,8 @@ public class Mode1 extends LinearOpMode {
 
             if (gamepad2.a) {
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
+            } else if (gamepad2.y) {
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_3);
             } else {
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
             }
