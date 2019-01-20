@@ -10,7 +10,8 @@ import org.firstinspires.ftc.teamcode.Robot;
 @TeleOp(name = "Tele Op V1", group = "Official")
 public class Mode1 extends LinearOpMode {
 
-    public final double SERVO_POS_1 = 1, SERVO_POS_2 = 0, SERVO_POS_3 = 0.5;
+
+    public final double SERVO_POS_1 = 0.6, SERVO_POS_2 = 0.3, SERVO_POS_3 = 0.5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -23,8 +24,22 @@ public class Mode1 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            Robot.getInstance().getLiftMotor1().getMotor().setPower(gamepad1.right_trigger);
-            Robot.getInstance().getLiftMotor2().getMotor().setPower(gamepad1.left_trigger);
+            if(gamepad1.right_trigger>0.1f)
+                Robot.getInstance().getLiftMotor1().getMotor().setPower(gamepad1.right_trigger);
+            else
+                Robot.getInstance().getLiftMotor1().getMotor().setPower(0.0f);
+
+            if(gamepad1.left_trigger>0.1f)
+                Robot.getInstance().getLiftMotor2().getMotor().setPower(gamepad1.left_trigger);
+            else
+                Robot.getInstance().getLiftMotor2().getMotor().setPower(0.0f);
+
+            if(gamepad1.dpad_left)
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
+            else if(gamepad1.dpad_right)
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
+            else if(gamepad1.dpad_up)
+                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_3);
 
 //            if (gamepad2.a) {
 //                Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);

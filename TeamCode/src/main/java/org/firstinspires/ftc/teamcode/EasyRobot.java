@@ -24,11 +24,11 @@ import java.util.List;
 
 public abstract class EasyRobot extends LinearOpMode{
 
-    private static final String VUFORIA_KEY = "Ae1B0KT/////AAAAmb1XYh8lnkJApASHU4GlfoqG1HM2p/vcZ5IxoIMZChOo2PH0w70nDnGNquAykLVE1+9dA+dH8LGl5G1s0ts72YIhfH7FShO4GtIjsIkf8Sgolfi3qdzfQ+t0ga1a90ISGY3ZxKFoz6M6I8URFSPwju493j1WM73/xTwIWyMy3SSgz8O0S+MSrYTUG8e97iY3RLcH6OefPQNWzvH9Lh8+rxnjwR9RR40WHD/Oefh83kN7EanocJi/PUxTc+zAlfrcurVQCUTOd3yHlZeFtrZ9zVMgPZ/p9RKYK+/gUKYmmdBALrtjkFC6YI6XPRgCUnVZU9QP6DWj7XKT93PDRlaSvmhBztDG+GGGb9/Vu2Hwbg5b";
+    private static final String VUFORIA_KEY = "AWIKGT7/////AAABmS3bsjJazEclpQEbA+BwmGRv5e1zEDZUgBVwvH+PniaFdrTOn96jCmryjubsOJdYXcsAkilFSWI4OSu4CNdB/AG6Q4JKSdwrvYwQIQ6H03QXP28Vf3gQynijHYcAVwymB939toFmo/hujvmzOTaecqE1F9dlVs03PREtZKQ4N1OOxS3mDoq4BxD8ZXFxvdAB/+aIrW//rGjWNBnf99CzCLZZruLyCvNcg/lu3DhH7o6PwVqjDZV8xNFoNGnHcKKbEgxibyYobK0uHZoxcIwLDFo7YLf+HYUSPWs4Pc6TS/KW8sa47Q8lpdDUiu0TSnJOQLdMc2C5H10nDo65mTkWJOnVuak+FKJL9LH7Ix3Ux5/A";
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLift;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLift, extendLift2;
     private CRServo collectorServo;
     private Servo collectorRotateServo;
     private BNO055IMU imu;
@@ -59,6 +59,7 @@ public abstract class EasyRobot extends LinearOpMode{
         rightMotorDown = new WizzTechDcMotor(opMode,"m4");
 
         extendLift = new WizzTechDcMotor(opMode,"m5");
+        extendLift2 = new WizzTechDcMotor(opMode, "m6");
     }
 
     public void initVuforia() {
@@ -161,7 +162,7 @@ public abstract class EasyRobot extends LinearOpMode{
             case Y:
                 return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle));
             case Z:
-                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle));
+                return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle));
             default:
                 return 0;
         }
@@ -232,6 +233,10 @@ public abstract class EasyRobot extends LinearOpMode{
 
     public WizzTechDcMotor getExtendLift() {
         return extendLift;
+    }
+
+    public WizzTechDcMotor getExtendLift2() {
+        return extendLift2;
     }
 
     public VuforiaLocalizer getVuforia(int index) {

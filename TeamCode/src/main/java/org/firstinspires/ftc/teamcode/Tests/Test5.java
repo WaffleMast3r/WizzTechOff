@@ -15,8 +15,8 @@ public class Test5 extends EasyRobot {
 
         waitForStart();
 
-        MotorEncoderController.getInstance().drive(getLeftMotorUp(), 10, 0.5, false);
-        MotorEncoderController.getInstance().drive(getRightMotorUp(), 10, 0.5, false);
+        MotorEncoderController.getInstance().drive(getLeftMotorUp(), -10, 0.5, false);
+        MotorEncoderController.getInstance().drive(getRightMotorUp(), -10, 0.5, false);
         MotorEncoderController.getInstance().drive(getLeftMotorDown(), 10, 0.5, false);
         MotorEncoderController.getInstance().drive(getRightMotorDown(), 10, 0.5, false);
         MotorEncoderController.getInstance().update("m1","m2","m3","m4");
