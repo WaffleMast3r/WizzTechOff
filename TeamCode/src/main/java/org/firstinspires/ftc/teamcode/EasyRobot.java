@@ -11,18 +11,26 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class EasyRobot extends LinearOpMode{
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+
+
+public abstract class EasyRobot extends LinearOpMode {
 
     private static final String VUFORIA_KEY = "AWIKGT7/////AAABmS3bsjJazEclpQEbA+BwmGRv5e1zEDZUgBVwvH+PniaFdrTOn96jCmryjubsOJdYXcsAkilFSWI4OSu4CNdB/AG6Q4JKSdwrvYwQIQ6H03QXP28Vf3gQynijHYcAVwymB939toFmo/hujvmzOTaecqE1F9dlVs03PREtZKQ4N1OOxS3mDoq4BxD8ZXFxvdAB/+aIrW//rGjWNBnf99CzCLZZruLyCvNcg/lu3DhH7o6PwVqjDZV8xNFoNGnHcKKbEgxibyYobK0uHZoxcIwLDFo7YLf+HYUSPWs4Pc6TS/KW8sa47Q8lpdDUiu0TSnJOQLdMc2C5H10nDo65mTkWJOnVuak+FKJL9LH7Ix3Ux5/A";
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
@@ -35,6 +43,7 @@ public abstract class EasyRobot extends LinearOpMode{
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
+    private List<VuforiaTrackable> allTrackables;
 
     public EasyRobot() {
     }
@@ -52,31 +61,32 @@ public abstract class EasyRobot extends LinearOpMode{
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
         //Init of the chassis motor
-        //modificare suspicioasa
-        leftMotorUp = new WizzTechDcMotor(opMode,"m1");
-        rightMotorUp = new WizzTechDcMotor(opMode,"m2");
-        leftMotorDown = new WizzTechDcMotor(opMode,"m3");
-        rightMotorDown = new WizzTechDcMotor(opMode,"m4");
-
-        extendLift = new WizzTechDcMotor(opMode,"m5");
-        extendLift2 = new WizzTechDcMotor(opMode, "m6");
+//        //modificare suspicioasa
+//        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
+//        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
+//        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
+//        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
+//
+//        extendLift = new WizzTechDcMotor(opMode, "m5");
+//        extendLift2 = new WizzTechDcMotor(opMode, "m6");
     }
 
     public void initVuforia() {
 //        VuforiaLocalizer.Parameters internalBack = new VuforiaLocalizer.Parameters();
-//        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
-        VuforiaLocalizer.Parameters extern1 = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
+//        VuforiaLocalizer.Parameters extern1 = new VuforiaLocalizer.Parameters();
 
 //        internalBack.vuforiaLicenseKey = VUFORIA_KEY;
-//        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
-        extern1.vuforiaLicenseKey = VUFORIA_KEY;
+        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
+//        extern1.vuforiaLicenseKey = VUFORIA_KEY;
+//        extern1.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 //        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-//        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        extern1.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+//        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam 1");
 
 //        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
-//        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
-        cams[2] = ClassFactory.getInstance().createVuforia(extern1);
+        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
+//        cams[2] = ClassFactory.getInstance().createVuforia(extern1);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
 //            initTfod();
         } else {
@@ -158,14 +168,98 @@ public abstract class EasyRobot extends LinearOpMode{
     public double getAngle(Axis axis) {
         switch (axis) {
             case X:
-                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).firstAngle));
+                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).firstAngle));
             case Y:
-                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).secondAngle));
+                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).secondAngle));
             case Z:
-                return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle));
+                return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).thirdAngle));
             default:
                 return 0;
         }
+    }
+
+    public void initTrackable(int cameraIndex, TrackableSettings settings) {
+        VuforiaTrackables targetsRoverRuckus = cams[cameraIndex].loadTrackablesFromAsset("RoverRuckus");
+        VuforiaTrackable blueRover = targetsRoverRuckus.get(0);
+        blueRover.setName("Blue-Rover");
+        VuforiaTrackable redFootprint = targetsRoverRuckus.get(1);
+        redFootprint.setName("Red-Footprint");
+        VuforiaTrackable frontCraters = targetsRoverRuckus.get(2);
+        frontCraters.setName("Front-Craters");
+        VuforiaTrackable backSpace = targetsRoverRuckus.get(3);
+        backSpace.setName("Back-Space");
+
+        allTrackables = new ArrayList<>();
+        allTrackables.addAll(targetsRoverRuckus);
+
+        OpenGLMatrix blueRoverLocationOnField = OpenGLMatrix
+                .translation(0, settings.getMmFTCFieldWidth(), settings.getMmTargetHeight())
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0));
+        blueRover.setLocation(blueRoverLocationOnField);
+
+        OpenGLMatrix redFootprintLocationOnField = OpenGLMatrix
+                .translation(0, -settings.getMmFTCFieldWidth(), settings.getMmTargetHeight())
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180));
+        redFootprint.setLocation(redFootprintLocationOnField);
+
+        OpenGLMatrix frontCratersLocationOnField = OpenGLMatrix
+                .translation(-settings.getMmFTCFieldWidth(), 0, settings.getMmTargetHeight())
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
+        frontCraters.setLocation(frontCratersLocationOnField);
+
+        OpenGLMatrix backSpaceLocationOnField = OpenGLMatrix
+                .translation(settings.getMmFTCFieldWidth(), 0, settings.getMmTargetHeight())
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90));
+        backSpace.setLocation(backSpaceLocationOnField);
+
+        final int CAMERA_FORWARD_DISPLACEMENT = 110;   // eg: Camera is 110 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
+
+        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
+                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, AxesOrder.YZX, DEGREES, -90, 0, 0)); // TODO: 1/21/2019 Poate e 90
+
+        /**  Let all the trackable listeners know where the phone is.  */
+        for (VuforiaTrackable trackable : allTrackables) {
+            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, VuforiaLocalizer.CameraDirection.BACK);
+        }
+    }
+
+    public Location getLocation() {
+
+        OpenGLMatrix lastLocation = null;
+        for (VuforiaTrackable trackable : allTrackables) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                if (robotLocationTransform != null) {
+                    lastLocation = robotLocationTransform;
+                }
+
+                VectorF translation = lastLocation.getTranslation();
+                //telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                //        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                float x = translation.get(0) / 25.4f;
+                float y = translation.get(1) / 25.4f;       //Salvam in parametri pozitia de pe teren
+                float z = translation.get(2) / 25.4f;       //Funcia trebuie chemata in fiecare secunda
+
+                // express the rotation of the robot in degrees.
+                Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                //telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                float roll = rotation.firstAngle;
+                float pitch = rotation.secondAngle;     //Salvam rotatia in parametrii functiei
+                float heading = rotation.thirdAngle;
+
+                return new Location(x, y, z, roll, pitch, heading);
+            } else {
+                //telemetry.addData("Visible Target", "none");
+            }
+            //telemetry.update();
+            return new Location(0, 0, 0, 0, 0, 0);
+        }
+
+        return null;
     }
 
     @SuppressWarnings("deprecation")
@@ -289,5 +383,97 @@ public abstract class EasyRobot extends LinearOpMode{
         void onCenter(int... values);
 
         void onRight(int... values);
+    }
+
+    public class Location {
+        float x;
+        float y;
+        float z;
+        float roll;
+        float pitch;
+        float heading;
+
+        public Location(float x, float y, float z, float roll, float pitch, float heading) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.roll = roll;
+            this.pitch = pitch;
+            this.heading = heading;
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public float getZ() {
+            return z;
+        }
+
+        public float getRoll() {
+            return roll;
+        }
+
+        public float getPitch() {
+            return pitch;
+        }
+
+        public float getHeading() {
+            return heading;
+        }
+
+        public void print() {
+            telemetry.addData("X", x);
+            telemetry.addData("Y", y);
+            telemetry.addData("Z", z);
+            telemetry.addData("Roll", roll);
+            telemetry.addData("Pitch", pitch);
+            telemetry.addData("Heading", heading);
+            telemetry.update();
+        }
+    }
+
+    public class TrackableSettings {
+        float mmPerInch = 25.4f;
+        float mmFTCFieldWidth = (12 * 6) * mmPerInch;
+        float mmTargetHeight = (6) * mmPerInch;
+        int CAMERA_FORWARD_DISPLACEMENT = 110;
+        int CAMERA_VERTICAL_DISPLACEMENT = 200;
+        int CAMERA_LEFT_DISPLACEMENT = 0;
+
+        public TrackableSettings() {
+        }
+
+        public TrackableSettings(float mmFTCFieldWidth, float mmTargetHeight, int CAMERA_FORWARD_DISPLACEMENT, int CAMERA_VERTICAL_DISPLACEMENT, int CAMERA_LEFT_DISPLACEMENT) {
+            this.mmFTCFieldWidth = mmFTCFieldWidth;
+            this.mmTargetHeight = mmTargetHeight;
+            this.CAMERA_FORWARD_DISPLACEMENT = CAMERA_FORWARD_DISPLACEMENT;
+            this.CAMERA_VERTICAL_DISPLACEMENT = CAMERA_VERTICAL_DISPLACEMENT;
+            this.CAMERA_LEFT_DISPLACEMENT = CAMERA_LEFT_DISPLACEMENT;
+        }
+
+        public float getMmFTCFieldWidth() {
+            return mmFTCFieldWidth;
+        }
+
+        public float getMmTargetHeight() {
+            return mmTargetHeight;
+        }
+
+        public int getCAMERA_FORWARD_DISPLACEMENT() {
+            return CAMERA_FORWARD_DISPLACEMENT;
+        }
+
+        public int getCAMERA_VERTICAL_DISPLACEMENT() {
+            return CAMERA_VERTICAL_DISPLACEMENT;
+        }
+
+        public int getCAMERA_LEFT_DISPLACEMENT() {
+            return CAMERA_LEFT_DISPLACEMENT;
+        }
     }
 }
