@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -27,6 +26,7 @@ import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 
@@ -44,6 +44,9 @@ public abstract class EasyRobot extends LinearOpMode {
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
     private List<VuforiaTrackable> allTrackables;
+    private VuforiaTrackables targetsRoverRuckus;
+    private OpenGLMatrix lastLocation;
+    private boolean targetVisible;
 
     public EasyRobot() {
     }
@@ -72,38 +75,40 @@ public abstract class EasyRobot extends LinearOpMode {
     }
 
     public void initVuforia() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        VuforiaLocalizer.Parameters internalBack = new VuforiaLocalizer.Parameters();
-        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
-//        VuforiaLocalizer.Parameters extern1 = new VuforiaLocalizer.Parameters();
+//        VuforiaLocalizer.Parameters internalFront = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters extern1 = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
 //        internalBack.vuforiaLicenseKey = VUFORIA_KEY;
-        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
-//        extern1.vuforiaLicenseKey = VUFORIA_KEY;
-//        extern1.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+//        internalFront.vuforiaLicenseKey = VUFORIA_KEY;
+        extern1.vuforiaLicenseKey = VUFORIA_KEY;
+
 //        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-//        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam 1");
+//        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam 1");
 
 //        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
-        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
-//        cams[2] = ClassFactory.getInstance().createVuforia(extern1);
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-//            initTfod();
-        } else {
-            System.err.println("Cannot init tfod");
-        }
+//        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
+        cams[2] = ClassFactory.getInstance().createVuforia(extern1);
+
     }
 
     public void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        for (int i = 0; i < cams.length; i++) {
-            if (cams[i] != null) {
-                TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-                tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
-                tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
+            for (int i = 0; i < cams.length; i++) {
+                if (cams[i] != null) {
+                    TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+                    tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
+                    tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
+                }
             }
+        } else {
+            System.err.println("Cannot init tfod");
         }
+
     }
 
     public void runObjectDetection(CameraOrientation orientation, int cameraIndex, ObjectDetected action) {
@@ -168,9 +173,9 @@ public abstract class EasyRobot extends LinearOpMode {
     public double getAngle(Axis axis) {
         switch (axis) {
             case X:
-                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).firstAngle));
+                return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).firstAngle));
             case Y:
-                return Double.parseDouble(String.format("%.0f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).secondAngle));
+                return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).secondAngle));
             case Z:
                 return Double.parseDouble(String.format("%.00f", imu.getAngularOrientation(EXTRINSIC, XYZ, DEGREES).thirdAngle));
             default:
@@ -179,7 +184,7 @@ public abstract class EasyRobot extends LinearOpMode {
     }
 
     public void initTrackable(int cameraIndex, TrackableSettings settings) {
-        VuforiaTrackables targetsRoverRuckus = cams[cameraIndex].loadTrackablesFromAsset("RoverRuckus");
+        targetsRoverRuckus = cams[cameraIndex].loadTrackablesFromAsset("RoverRuckus");
         VuforiaTrackable blueRover = targetsRoverRuckus.get(0);
         blueRover.setName("Blue-Rover");
         VuforiaTrackable redFootprint = targetsRoverRuckus.get(1);
@@ -212,54 +217,52 @@ public abstract class EasyRobot extends LinearOpMode {
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90));
         backSpace.setLocation(backSpaceLocationOnField);
 
-        final int CAMERA_FORWARD_DISPLACEMENT = 110;   // eg: Camera is 110 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
-
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, AxesOrder.YZX, DEGREES, -90, 0, 0)); // TODO: 1/21/2019 Poate e 90
+                .translation(settings.getCAMERA_FORWARD_DISPLACEMENT(), settings.getCAMERA_LEFT_DISPLACEMENT(), settings.getCAMERA_VERTICAL_DISPLACEMENT())
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, -90, 0, 0)); // TODO: 1/21/2019 Poate e 90
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, VuforiaLocalizer.CameraDirection.BACK);
+            if (cameraIndex >= 2) {
+                ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(cams[cameraIndex].getCameraName(), phoneLocationOnRobot);
+            } else {
+                if (cameraIndex == 0) {
+                    ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, VuforiaLocalizer.CameraDirection.BACK);
+                } else {
+                    ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, VuforiaLocalizer.CameraDirection.FRONT);
+                }
+            }
         }
+
+    }
+
+    public void activateTrackable(){
+        targetsRoverRuckus.activate();
     }
 
     public Location getLocation() {
 
-        OpenGLMatrix lastLocation = null;
+        targetVisible = false;
+
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
 
-                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                targetVisible = true;
+
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
                     lastLocation = robotLocationTransform;
                 }
-
-                VectorF translation = lastLocation.getTranslation();
-                //telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                //        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-                float x = translation.get(0) / 25.4f;
-                float y = translation.get(1) / 25.4f;       //Salvam in parametri pozitia de pe teren
-                float z = translation.get(2) / 25.4f;       //Funcia trebuie chemata in fiecare secunda
-
-                // express the rotation of the robot in degrees.
-                Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                //telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-                float roll = rotation.firstAngle;
-                float pitch = rotation.secondAngle;     //Salvam rotatia in parametrii functiei
-                float heading = rotation.thirdAngle;
-
-                return new Location(x, y, z, roll, pitch, heading);
-            } else {
-                //telemetry.addData("Visible Target", "none");
             }
-            //telemetry.update();
-            return new Location(0, 0, 0, 0, 0, 0);
         }
 
-        return null;
+        if (targetVisible){
+            VectorF translation = lastLocation.getTranslation();
+            Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+            return new Location(translation.get(0) / 25.4f, translation.get(1) / 25.4f, translation.get(2) / 25.4f, rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+        }
+
+        return new Location(-1);
     }
 
     @SuppressWarnings("deprecation")
@@ -393,6 +396,12 @@ public abstract class EasyRobot extends LinearOpMode {
         float pitch;
         float heading;
 
+        int status = 1;
+
+        public Location(int status) {
+            this.status = status;
+        }
+
         public Location(float x, float y, float z, float roll, float pitch, float heading) {
             this.x = x;
             this.y = y;
@@ -427,12 +436,16 @@ public abstract class EasyRobot extends LinearOpMode {
         }
 
         public void print() {
-            telemetry.addData("X", x);
-            telemetry.addData("Y", y);
-            telemetry.addData("Z", z);
-            telemetry.addData("Roll", roll);
-            telemetry.addData("Pitch", pitch);
-            telemetry.addData("Heading", heading);
+            if (status != -1) {
+                telemetry.addData("Position(X, Y, Z)", "%.00f, %.00f, %.00f", x, y, z);
+                telemetry.addData("Position(Roll, Pitch, Heading)", "%.00f, %.00f, %.00f", roll, pitch, heading);
+//            telemetry.addData("X", x);
+//            telemetry.addData("Y", y);
+//            telemetry.addData("Z", z);
+//            telemetry.addData("Roll", roll);
+//            telemetry.addData("Pitch", pitch);
+//            telemetry.addData("Heading", heading);
+            }
             telemetry.update();
         }
     }

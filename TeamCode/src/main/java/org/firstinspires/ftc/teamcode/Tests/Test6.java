@@ -10,12 +10,14 @@ public class Test6 extends EasyRobot {
     public void runOpMode() throws InterruptedException {
         initRobot(this);
         initVuforia();
-        initTrackable(1, new TrackableSettings());
+        initTrackable(2, new TrackableSettings());
 //        initTfod();
         waitForStart();
+        
+        activateTrackable();
+
         while (opModeIsActive())
             getLocation().print();
-
 
 
         sleep(10000);
