@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class MotorEncoderController {
 
     private static MotorEncoderController instance = null;
-    private int TICKS_PER_REVOLUTION = 575;
+    private int TICKS_PER_REVOLUTION = 575; // Tetrix 1440 AndyMark 1100
     private double COUNTS_PER_INCH = TICKS_PER_REVOLUTION / 5;   //16.5 // TODO: 12/1/2018 Change here
     private HashMap<String, Thread> queued = new HashMap<>();
     private HashMap<String, Thread> running = new HashMap<>();
@@ -50,17 +50,16 @@ public class MotorEncoderController {
                 public void run() {
 
                     double inch = distance * (1 / 2.54);
-                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
                     int newPosition = (int) (COUNTS_PER_INCH * inch);
 
+                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
                     motor.getMotor().setTargetPosition(newPosition);
                     motor.getMotor().setPower(speed);
 
                     while (motor.getMotor().isBusy() && !emergencyStop) {
-
                     }
 
                     motor.getMotor().setPower(0.01);

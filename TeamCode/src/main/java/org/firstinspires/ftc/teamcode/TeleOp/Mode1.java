@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.MotorEncoderController;
 import org.firstinspires.ftc.teamcode.Robot;
 
 @TeleOp(name = "Tele Op V1", group = "Official")
+@Disabled
 public class Mode1 extends LinearOpMode {
 
 
@@ -24,21 +26,29 @@ public class Mode1 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if(gamepad1.right_trigger>0.1f)
-                Robot.getInstance().getLiftMotor1().getMotor().setPower(gamepad1.right_trigger);
-            else
-                Robot.getInstance().getLiftMotor1().getMotor().setPower(0.0f);
+            if (gamepad1.left_stick_button) {
 
-            if(gamepad1.left_trigger>0.1f)
-                Robot.getInstance().getLiftMotor2().getMotor().setPower(gamepad1.left_trigger);
-            else
-                Robot.getInstance().getLiftMotor2().getMotor().setPower(0.0f);
+            } else {
 
-            if(gamepad1.dpad_left)
+            }
+
+            if (gamepad1.right_stick_button) {
+
+            } else {
+
+            }
+
+            if (gamepad1.left_trigger >= 0.1) {
+
+            } else {
+
+            }
+
+            if (gamepad1.dpad_left)
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_2);
-            else if(gamepad1.dpad_right)
+            else if (gamepad1.dpad_right)
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_1);
-            else if(gamepad1.dpad_up)
+            else if (gamepad1.dpad_up)
                 Robot.getInstance().getCollectorPivotServo().setPosition(SERVO_POS_3);
 
 //            if (gamepad2.a) {

@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -36,9 +37,9 @@ public abstract class EasyRobot extends LinearOpMode {
     private static TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, extendCollectorMotorArm, extendLift, extendLift2;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, handMotor, extendLift, extendLift2;
     private CRServo collectorServo;
-    private Servo collectorRotateServo;
+    private Servo collectorRotateServo, paletaServo1, paletaServo2, liftServo1, liftServo2;
     private BNO055IMU imu;
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
@@ -51,7 +52,6 @@ public abstract class EasyRobot extends LinearOpMode {
     public EasyRobot() {
     }
 
-
     public static void disable() {
         for (int i = 0; i < tfods.length; i++) {
             if (tfods[i] != null) {
@@ -60,18 +60,35 @@ public abstract class EasyRobot extends LinearOpMode {
         }
     }
 
+
     public void initRobot(LinearOpMode opMode) {
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
-        //Init of the chassis motor
-//        //modificare suspicioasa
-//        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
-//        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
-//        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
-//        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
-//
-//        extendLift = new WizzTechDcMotor(opMode, "m5");
-//        extendLift2 = new WizzTechDcMotor(opMode, "m6");
+
+        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
+        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
+        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
+        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
+
+        handMotor = new WizzTechDcMotor(opMode, "m5");
+        extendLift = new WizzTechDcMotor(opMode, "m6");
+        extendLift2 = new WizzTechDcMotor(opMode, "m7");
+
+        handMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendLift2.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        handMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendLift2 .getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        collectorServo = opMode.hardwareMap.crservo.get("s1");
+        collectorRotateServo = opMode.hardwareMap.servo.get("s2");
+
+        paletaServo1 = opMode.hardwareMap.servo.get("s3");
+        paletaServo2 = opMode.hardwareMap.servo.get("s4");
+        liftServo1 = opMode.hardwareMap.servo.get("s5");
+        liftServo2 = opMode.hardwareMap.servo.get("s6");
     }
 
     public void initVuforia() {
@@ -86,7 +103,7 @@ public abstract class EasyRobot extends LinearOpMode {
 
 //        internalBack.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 //        internalFront.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        extern1.cameraName = hardwareMap.get(WebcamName.class, "WebCam 1");
+        extern1.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
 //        cams[0] = ClassFactory.getInstance().createVuforia(internalBack);
 //        cams[1] = ClassFactory.getInstance().createVuforia(internalFront);
@@ -94,64 +111,51 @@ public abstract class EasyRobot extends LinearOpMode {
 
     }
 
-    public void initTfod() {
+    public void initTfod(int index) {
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-            for (int i = 0; i < cams.length; i++) {
-                if (cams[i] != null) {
-                    TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-                    tfods[i] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[i]);
-                    tfods[i].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
-                }
+            if (cams[index] != null) {
+                TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+                tfods[index] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[index]);
+                tfods[index].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
             }
+
         } else {
             System.err.println("Cannot init tfod");
         }
 
     }
 
-    public void runObjectDetection(CameraOrientation orientation, int cameraIndex, ObjectDetected action) {
+    public void runObjectDetection(int cameraIndex, ObjectDetected action) {
         TFObjectDetector tf = tfods[cameraIndex];
         tf.activate();
-        int[] positions = new int[3];
-        while (opMode.opModeIsActive()) {
+        for (int i = 0; i < 3; i++) {
             List<Recognition> updatedRecognitions = tf.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                if (updatedRecognitions.size() == 3) {
-                    int goldMineralX = -1;
-                    int silverMineral1X = -1;
-                    int silverMineral2X = -1;
-                    for (Recognition recognition : updatedRecognitions) {
-                        if (recognition.getLabel().equals("Gold Mineral")) {
-                            goldMineralX = (int) recognition.getLeft();
-                        } else if (silverMineral1X == -1) {
-                            silverMineral1X = (int) recognition.getLeft();
-                        } else {
-                            silverMineral2X = (int) recognition.getLeft();
-                        }
-                    }
-                    if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                        if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                            if (positions[0]++ == 10) {
-                                action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
-                                tf.shutdown();
-                                return;
-                            }
-                        } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                            if (positions[2]++ == 10) {
-                                action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
-                                tf.shutdown();
-                                return;
-                            }
-                        } else {
-                            if (positions[1]++ == 10) {
-                                action.onCenter(goldMineralX, silverMineral1X, silverMineral2X);
-                                tf.shutdown();
-                                return;
-                            }
-                        }
-                    }
+            while (true) {
+                if (updatedRecognitions != null) {
+                    if (updatedRecognitions.size() == 1) break;
+                }
+                updatedRecognitions = tf.getUpdatedRecognitions();
+            }
+            if (updatedRecognitions.get(0).getLabel().equals("Gold Mineral")) {
+                action.pickup();
+                switch (i) {
+                    case 0:
+                        action.onCenter();
+                    case 1:
+                        action.onLeft();
+                    case 2:
+                        action.onRight();
+                }
+                action.loadCargo();
+                return;
+
+            } else {
+                if (i == 0) {
+                    turnTo(0.3, 27);
+                } else {
+                    turnTo(0.3, -27);
                 }
             }
         }
@@ -233,10 +237,9 @@ public abstract class EasyRobot extends LinearOpMode {
                 }
             }
         }
-
     }
 
-    public void activateTrackable(){
+    public void activateTrackable() {
         targetsRoverRuckus.activate();
     }
 
@@ -249,14 +252,14 @@ public abstract class EasyRobot extends LinearOpMode {
 
                 targetVisible = true;
 
-                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
                     lastLocation = robotLocationTransform;
                 }
             }
         }
 
-        if (targetVisible){
+        if (targetVisible) {
             VectorF translation = lastLocation.getTranslation();
             Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
             return new Location(translation.get(0) / 25.4f, translation.get(1) / 25.4f, translation.get(2) / 25.4f, rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
@@ -266,25 +269,39 @@ public abstract class EasyRobot extends LinearOpMode {
     }
 
     @SuppressWarnings("deprecation")
-    private void turnTo(Axis axis, double power, int degrees) throws InterruptedException {
+    public void turnTo(double power, int degrees) {
 
-        double angle = getAngle(axis);
+        double angle = getAngle(Axis.Z);
         while (Math.abs(angle - degrees) > 0) {
-            if (angle > degrees) {
+            angle = getAngle(Axis.Z);
+
+            telemetry.addData("Trying to get to", degrees + "(" + power + ")");
+            telemetry.addData("Angle", angle);
+            telemetry.update();
+
+            if (angle < degrees) {
                 getLeftMotorUp().getMotor().setPower(power);
                 getRightMotorUp().getMotor().setPower(power);
                 getLeftMotorDown().getMotor().setPower(power);
                 getRightMotorDown().getMotor().setPower(power);
-            } else if (angle < degrees) {
+            } else if (angle > degrees) {
                 getLeftMotorUp().getMotor().setPower(-power);
                 getRightMotorUp().getMotor().setPower(-power);
                 getLeftMotorDown().getMotor().setPower(-power);
                 getRightMotorDown().getMotor().setPower(-power);
             }
-            opMode.waitOneFullHardwareCycle();
+            try {
+                opMode.waitOneFullHardwareCycle();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        opMode.waitOneFullHardwareCycle();
+        try {
+            opMode.waitOneFullHardwareCycle();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         getLeftMotorUp().getMotor().setPower(0.01);
         getRightMotorUp().getMotor().setPower(0.01);
         getLeftMotorDown().getMotor().setPower(0.01);
@@ -312,8 +329,32 @@ public abstract class EasyRobot extends LinearOpMode {
         return rightMotorDown;
     }
 
-    public WizzTechDcMotor getExtendCollectorMotorArm() {
-        return extendCollectorMotorArm;
+    public WizzTechDcMotor getExtendLift2() {
+        return extendLift2;
+    }
+
+    public WizzTechDcMotor getExtendLift() {
+        return extendLift;
+    }
+
+    public Servo getPaletaServo1() {
+        return paletaServo1;
+    }
+
+    public Servo getPaletaServo2() {
+        return paletaServo2;
+    }
+
+    public Servo getLiftServo1() {
+        return liftServo1;
+    }
+
+    public Servo getLiftServo2() {
+        return liftServo2;
+    }
+
+    public Servo getCollectorRotateServo() {
+        return collectorRotateServo;
     }
 
     public CRServo getCollectorServo() {
@@ -328,12 +369,8 @@ public abstract class EasyRobot extends LinearOpMode {
         this.side = side;
     }
 
-    public WizzTechDcMotor getExtendLift() {
-        return extendLift;
-    }
-
-    public WizzTechDcMotor getExtendLift2() {
-        return extendLift2;
+    public WizzTechDcMotor getHandMotor() {
+        return handMotor;
     }
 
     public VuforiaLocalizer getVuforia(int index) {
@@ -366,26 +403,16 @@ public abstract class EasyRobot extends LinearOpMode {
 
     }
 
-    public enum CameraOrientation {
-        PORTRAIT(4), LANDSCAPE(3), PORTRAIT_FLIPPED(2), LANDSCAPE_FLIPPED(1);
-
-        private int id;
-
-        CameraOrientation(int id) {
-            this.id = id;
-        }
-
-        public int getOrientationID() {
-            return id;
-        }
-    }
-
     public interface ObjectDetected {
-        void onLeft(int... values);
+        void pickup();
 
-        void onCenter(int... values);
+        void onLeft();
 
-        void onRight(int... values);
+        void onCenter();
+
+        void onRight();
+
+        void loadCargo();
     }
 
     public class Location {
@@ -461,14 +488,6 @@ public abstract class EasyRobot extends LinearOpMode {
         public TrackableSettings() {
         }
 
-        public TrackableSettings(float mmFTCFieldWidth, float mmTargetHeight, int CAMERA_FORWARD_DISPLACEMENT, int CAMERA_VERTICAL_DISPLACEMENT, int CAMERA_LEFT_DISPLACEMENT) {
-            this.mmFTCFieldWidth = mmFTCFieldWidth;
-            this.mmTargetHeight = mmTargetHeight;
-            this.CAMERA_FORWARD_DISPLACEMENT = CAMERA_FORWARD_DISPLACEMENT;
-            this.CAMERA_VERTICAL_DISPLACEMENT = CAMERA_VERTICAL_DISPLACEMENT;
-            this.CAMERA_LEFT_DISPLACEMENT = CAMERA_LEFT_DISPLACEMENT;
-        }
-
         public float getMmFTCFieldWidth() {
             return mmFTCFieldWidth;
         }
@@ -489,4 +508,40 @@ public abstract class EasyRobot extends LinearOpMode {
             return CAMERA_LEFT_DISPLACEMENT;
         }
     }
+
+//      if (updatedRecognitions.size() == 3) {
+//                        int goldMineralX = -1;
+//                        int silverMineral1X = -1;
+//                        int silverMineral2X = -1;
+//                        for (Recognition recognition : updatedRecognitions) {
+//                            if (recognition.getLabel().equals("Gold Mineral")) {
+//                                goldMineralX = (int) recognition.getRight();
+//                            } else if (silverMineral1X == -1) {
+//                                silverMineral1X = (int) recognition.getRight();
+//                            } else {
+//                                silverMineral2X = (int) recognition.getRight();
+//                            }
+//                        }
+//                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+//                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+//                                if (positions[0]++ == 10) {
+//                                    action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
+//                                    tf.shutdown();
+//                                    return;
+//                                }
+//                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+//                                if (positions[2]++ == 10) {
+//                                    action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
+//                                    tf.shutdown();
+//                                    return;
+//                                }
+//                            } else {
+//                                if (positions[1]++ == 10) {
+//                                    action.onCenter(goldMineralX, silverMineral1X, silverMineral2X);
+//                                    tf.shutdown();
+//                                    return;
+//                                }
+//                            }
+//                        }
+//                    }
 }

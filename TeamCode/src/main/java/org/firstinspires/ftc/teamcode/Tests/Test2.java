@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.opencv.android.JavaCameraView;
@@ -15,6 +16,7 @@ import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 
 @Autonomous(name = "Test 2 - OpenCV", group = "tests")
+@Disabled
 public class Test2 extends LinearOpMode {
 
     private View view;

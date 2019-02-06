@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MotorEncoderController;
 import org.firstinspires.ftc.teamcode.Robot;
 
 @Autonomous(name = "Mode1", group = "tests")
+@Disabled  
 public class Mode1 extends LinearOpMode {
 
     @Override

@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
 import org.firstinspires.ftc.teamcode.MotorEncoderController;
 import org.firstinspires.ftc.teamcode.Robot;
 
 @Autonomous(name = "Autonom Demo", group = "Official")
+@Disabled
 public class Mode2 extends EasyRobot {
 
     @Override
@@ -16,7 +17,7 @@ public class Mode2 extends EasyRobot {
 
           initRobot(this);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
-        getExtendLift2().getMotor().setPower(0.1f);
+        getHandMotor().getMotor().setPower(0.1f);
         initVuforia();
 //        initTfod();
 
@@ -24,11 +25,11 @@ public class Mode2 extends EasyRobot {
 
         waitForStart();
 
-        getExtendLift().getMotor().setPower(1.0f);
-        getExtendLift2().getMotor().setPower(0.0f);
+        getHandMotor().getMotor().setPower(1.0f);
+        getHandMotor().getMotor().setPower(0.0f);
 
         sleep(5000);
-        getExtendLift().getMotor().setPower(0.0f);
+        getHandMotor().getMotor().setPower(0.0f);
 
         //Drive stanga
         MotorEncoderController.getInstance().drive(getLeftMotorUp(), -15, 0.5, false);
@@ -63,9 +64,32 @@ public class Mode2 extends EasyRobot {
         MotorEncoderController.getInstance().update("m1","m2","m3","m4");
         sleep(3000);
 
-        runObjectDetection(CameraOrientation.PORTRAIT
-                , 2, new ObjectDetected() {
+        runObjectDetection(2, new ObjectDetected() {
             @Override
+            public void pickup() {
+
+            }
+
+            @Override
+            public void onLeft() {
+
+            }
+
+            @Override
+            public void onCenter() {
+
+            }
+
+            @Override
+            public void onRight() {
+
+            }
+
+            @Override
+            public void loadCargo() {
+
+            }
+
             public void onLeft(int... values) {
                 MotorEncoderController.getInstance().drive(getLeftMotorUp(), 15, 1.0, false);
                 MotorEncoderController.getInstance().drive(getRightMotorUp(), 15, -0.8, false);
@@ -84,7 +108,6 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().update("m1","m2","m3","m4");
             }
 
-            @Override
             public void onCenter(int... values) {
 
                 //Drive inainte
@@ -106,7 +129,6 @@ public class Mode2 extends EasyRobot {
                 MotorEncoderController.getInstance().update("m1","m2","m3","m4");
             }
 
-            @Override
             public void onRight(int... values) {
                 MotorEncoderController.getInstance().drive(getLeftMotorUp(), 10, 0.8, false);
                 MotorEncoderController.getInstance().drive(getRightMotorUp(), 10, -1.0, false);
