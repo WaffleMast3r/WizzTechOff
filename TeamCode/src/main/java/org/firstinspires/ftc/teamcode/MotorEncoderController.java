@@ -27,18 +27,22 @@ public class MotorEncoderController {
         instance = null;
     }
 
-    public void waitForMotors(String... names){
-        if (names.length == 1){
-            if (names[0].equalsIgnoreCase("*") || names[0].equalsIgnoreCase("all")){
-                while (!running.isEmpty()){}
-            }else{
-                for (String name : names){
-                    while (running.get(name) != null){}
+
+    public void waitForMotors(String... names) {
+        if (names.length == 1) {
+            if (names[0].equalsIgnoreCase("*") || names[0].equalsIgnoreCase("all")) {
+                while (!running.isEmpty()) {
+                }
+            } else {
+                for (String name : names) {
+                    while (running.get(name) != null) {
+                    }
                 }
             }
-        }else if (names.length > 1){
-            for (String name : names){
-                while (running.get(name) != null){}
+        } else if (names.length > 1) {
+            for (String name : names) {
+                while (running.get(name) != null) {
+                }
             }
         }
     }
@@ -57,6 +61,39 @@ public class MotorEncoderController {
                     motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     motor.getMotor().setTargetPosition(newPosition);
+                    motor.getMotor().setPower(speed);
+
+                    while (motor.getMotor().isBusy() && !emergencyStop) {
+                    }
+
+                    motor.getMotor().setPower(0.01);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                    running.remove(motor.getName());
+                }
+            }));
+            if (update) {
+                if (names.length == 0) {
+                    update(motor.getName());
+                } else {
+                    update(names);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("drive");
+        }
+    }
+
+    public synchronized void driveTicks(final WizzTechDcMotor motor, final int ticks, final double speed, boolean update, String... names) {
+        try {
+            queued.put(motor.getName(), new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                    motor.getMotor().setTargetPosition(ticks);
                     motor.getMotor().setPower(speed);
 
                     while (motor.getMotor().isBusy() && !emergencyStop) {

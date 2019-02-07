@@ -80,7 +80,9 @@ public abstract class EasyRobot extends LinearOpMode {
 
         handMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendLift2 .getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendLift2.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        extendLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         collectorServo = opMode.hardwareMap.crservo.get("s1");
         collectorRotateServo = opMode.hardwareMap.servo.get("s2");
