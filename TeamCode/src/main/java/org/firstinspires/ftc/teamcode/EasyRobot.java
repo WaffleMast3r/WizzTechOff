@@ -23,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
@@ -30,11 +31,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
-
 public abstract class EasyRobot extends LinearOpMode {
 
-    private static final String VUFORIA_KEY = "AWIKGT7/////AAABmS3bsjJazEclpQEbA+BwmGRv5e1zEDZUgBVwvH+PniaFdrTOn96jCmryjubsOJdYXcsAkilFSWI4OSu4CNdB/AG6Q4JKSdwrvYwQIQ6H03QXP28Vf3gQynijHYcAVwymB939toFmo/hujvmzOTaecqE1F9dlVs03PREtZKQ4N1OOxS3mDoq4BxD8ZXFxvdAB/+aIrW//rGjWNBnf99CzCLZZruLyCvNcg/lu3DhH7o6PwVqjDZV8xNFoNGnHcKKbEgxibyYobK0uHZoxcIwLDFo7YLf+HYUSPWs4Pc6TS/KW8sa47Q8lpdDUiu0TSnJOQLdMc2C5H10nDo65mTkWJOnVuak+FKJL9LH7Ix3Ux5/A";
-    private static TFObjectDetector[] tfods = new TFObjectDetector[3];
+    private final String VUFORIA_KEY = "AWIKGT7/////AAABmS3bsjJazEclpQEbA+BwmGRv5e1zEDZUgBVwvH+PniaFdrTOn96jCmryjubsOJdYXcsAkilFSWI4OSu4CNdB/AG6Q4JKSdwrvYwQIQ6H03QXP28Vf3gQynijHYcAVwymB939toFmo/hujvmzOTaecqE1F9dlVs03PREtZKQ4N1OOxS3mDoq4BxD8ZXFxvdAB/+aIrW//rGjWNBnf99CzCLZZruLyCvNcg/lu3DhH7o6PwVqjDZV8xNFoNGnHcKKbEgxibyYobK0uHZoxcIwLDFo7YLf+HYUSPWs4Pc6TS/KW8sa47Q8lpdDUiu0TSnJOQLdMc2C5H10nDo65mTkWJOnVuak+FKJL9LH7Ix3Ux5/A";
+    private TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
     private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, handMotor, extendLift, extendLift2;
@@ -48,18 +48,14 @@ public abstract class EasyRobot extends LinearOpMode {
     private VuforiaTrackables targetsRoverRuckus;
     private OpenGLMatrix lastLocation;
     private boolean targetVisible;
+    private int TICKS_PER_REVOLUTION = 575; // Tetrix 1440 AndyMark 1100
+    private double COUNTS_PER_INCH = TICKS_PER_REVOLUTION / 5;   //16.5 // TODO: 12/1/2018 Change here
+    private HashMap<String, Thread> queued = new HashMap<>();
+    private HashMap<String, Thread> running = new HashMap<>();
+    private boolean  xemergencyStop = false;
 
     public EasyRobot() {
     }
-
-    public static void disable() {
-        for (int i = 0; i < tfods.length; i++) {
-            if (tfods[i] != null) {
-                tfods[i].shutdown();
-            }
-        }
-    }
-
 
     public void initRobot(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -93,6 +89,15 @@ public abstract class EasyRobot extends LinearOpMode {
         liftServo2 = opMode.hardwareMap.servo.get("s6");
     }
 
+    public void disable() {
+        for (int i = 0; i < tfods.length; i++) {
+            if (tfods[i] != null) {
+                tfods[i].shutdown();
+            }
+        }
+        emergencyStop();
+    }
+
     public void initVuforia() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 //        VuforiaLocalizer.Parameters internalBack = new VuforiaLocalizer.Parameters();
@@ -122,11 +127,9 @@ public abstract class EasyRobot extends LinearOpMode {
                 tfods[index] = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, cams[index]);
                 tfods[index].loadModelFromAsset("RoverRuckus.tflite", "Gold Mineral", "Silver Mineral");
             }
-
         } else {
             System.err.println("Cannot init tfod");
         }
-
     }
 
     public void runObjectDetection(int cameraIndex, ObjectDetected action) {
@@ -136,11 +139,19 @@ public abstract class EasyRobot extends LinearOpMode {
             List<Recognition> updatedRecognitions = tf.getUpdatedRecognitions();
             while (true) {
                 if (updatedRecognitions != null) {
-                    if (updatedRecognitions.size() == 1) break;
+                    if (updatedRecognitions.size() != 0) break;
                 }
                 updatedRecognitions = tf.getUpdatedRecognitions();
             }
-            if (updatedRecognitions.get(0).getLabel().equals("Gold Mineral")) {
+
+            boolean found = false;
+            for (Recognition recogn : updatedRecognitions) {
+                if (recogn.getLabel().equals("Gold Mineral")) {
+                    found = true;
+                }
+            }
+            if (found) {
+                tf.shutdown();
                 action.pickup();
                 switch (i) {
                     case 0:
@@ -152,7 +163,6 @@ public abstract class EasyRobot extends LinearOpMode {
                 }
                 action.loadCargo();
                 return;
-
             } else {
                 if (i == 0) {
                     turnTo(0.3, 27);
@@ -160,6 +170,38 @@ public abstract class EasyRobot extends LinearOpMode {
                     turnTo(0.3, -27);
                 }
             }
+
+        }
+    }
+
+    public void keepPosition(int cameraIndex) {
+        TFObjectDetector tf = tfods[cameraIndex];
+        tf.activate();
+
+        List<Recognition> updatedRecognitions = tf.getUpdatedRecognitions();
+        while (true) {
+            if (updatedRecognitions != null) {
+                if (updatedRecognitions.size() != 0) {
+                    int x = (int) updatedRecognitions.get(0).getLeft();
+                    if (x > 400) {
+                        getLeftMotorUp().getMotor().setPower(0.3);
+                        getRightMotorUp().getMotor().setPower(0.3);
+                        getLeftMotorDown().getMotor().setPower(0.3);
+                        getRightMotorDown().getMotor().setPower(0.3);
+                    } else {
+                        getLeftMotorUp().getMotor().setPower(-0.3);
+                        getRightMotorUp().getMotor().setPower(-0.3);
+                        getLeftMotorDown().getMotor().setPower(-0.3);
+                        getRightMotorDown().getMotor().setPower(-0.3);
+                    }
+
+                    getLeftMotorUp().getMotor().setPower(0);
+                    getRightMotorUp().getMotor().setPower(0);
+                    getLeftMotorDown().getMotor().setPower(0);
+                    getRightMotorDown().getMotor().setPower(0);
+                }
+            }
+            updatedRecognitions = tf.getUpdatedRecognitions();
         }
     }
 
@@ -239,6 +281,124 @@ public abstract class EasyRobot extends LinearOpMode {
                 }
             }
         }
+    }
+
+    public void waitForMotors(String... names) {
+        if (names.length == 1) {
+            if (names[0].equalsIgnoreCase("*") || names[0].equalsIgnoreCase("all")) {
+                while (!running.isEmpty()) {
+                }
+            } else {
+                for (String name : names) {
+                    while (running.get(name) != null) {
+                    }
+                }
+            }
+        } else if (names.length > 1) {
+            for (String name : names) {
+                while (running.get(name) != null) {
+                }
+            }
+        }
+    }
+
+    public synchronized void drive(final WizzTechDcMotor motor, final int distance, final double speed, boolean update, String... names) {
+        try {
+            queued.put(motor.getName(), new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    double inch = distance * (1 / 2.54);
+                    int newPosition = (int) (COUNTS_PER_INCH * inch);
+
+                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                    motor.getMotor().setTargetPosition(newPosition);
+                    motor.getMotor().setPower(speed);
+
+                    while (motor.getMotor().isBusy() && !emergencyStop) {
+                    }
+
+                    motor.getMotor().setPower(0.01);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                    running.remove(motor.getName());
+                }
+            }));
+            if (update) {
+                if (names.length == 0) {
+                    update(motor.getName());
+                } else {
+                    update(names);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("driveForward");
+        }
+    }
+
+    public synchronized void driveTicks(final WizzTechDcMotor motor, final int ticks, final double speed, boolean update, String... names) {
+        try {
+            queued.put(motor.getName(), new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                    motor.getMotor().setTargetPosition(ticks);
+                    motor.getMotor().setPower(speed);
+
+                    while (motor.getMotor().isBusy() && !emergencyStop) {
+                    }
+
+                    DcMotor.ZeroPowerBehavior behavior = motor.getMotor().getZeroPowerBehavior();
+                    motor.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    motor.getMotor().setPower(0);
+                    motor.getMotor().setZeroPowerBehavior(behavior);
+                    motor.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                    running.remove(motor.getName());
+                }
+            }));
+            if (update) {
+                if (names.length == 0) {
+                    update(motor.getName());
+                } else {
+                    update(names);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("driveForward");
+        }
+    }
+
+    public synchronized void update(String... names) {
+        try {
+            if (names[0].equalsIgnoreCase("all") || names[0].equalsIgnoreCase("*")) {
+                for (String name : queued.keySet()) {
+                    running.put(name, queued.get(name));
+                    queued.remove(name).start();
+                }
+            } else {
+                for (String name : names) {
+                    running.put(name, queued.get(name));
+                    queued.remove(name).start();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("update");
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void emergencyStop() {
+        for (String name : running.keySet()) {
+            running.remove(name).stop();
+        }
+        emergencyStop = true;
     }
 
     public void activateTrackable() {
@@ -510,40 +670,4 @@ public abstract class EasyRobot extends LinearOpMode {
             return CAMERA_LEFT_DISPLACEMENT;
         }
     }
-
-//      if (updatedRecognitions.size() == 3) {
-//                        int goldMineralX = -1;
-//                        int silverMineral1X = -1;
-//                        int silverMineral2X = -1;
-//                        for (Recognition recognition : updatedRecognitions) {
-//                            if (recognition.getLabel().equals("Gold Mineral")) {
-//                                goldMineralX = (int) recognition.getRight();
-//                            } else if (silverMineral1X == -1) {
-//                                silverMineral1X = (int) recognition.getRight();
-//                            } else {
-//                                silverMineral2X = (int) recognition.getRight();
-//                            }
-//                        }
-//                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-//                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-//                                if (positions[0]++ == 10) {
-//                                    action.onLeft(goldMineralX, silverMineral1X, silverMineral2X);
-//                                    tf.shutdown();
-//                                    return;
-//                                }
-//                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-//                                if (positions[2]++ == 10) {
-//                                    action.onRight(goldMineralX, silverMineral1X, silverMineral2X);
-//                                    tf.shutdown();
-//                                    return;
-//                                }
-//                            } else {
-//                                if (positions[1]++ == 10) {
-//                                    action.onCenter(goldMineralX, silverMineral1X, silverMineral2X);
-//                                    tf.shutdown();
-//                                    return;
-//                                }
-//                            }
-//                        }
-//                    }
 }

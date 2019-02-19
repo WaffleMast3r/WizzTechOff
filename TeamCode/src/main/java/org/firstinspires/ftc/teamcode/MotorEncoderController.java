@@ -80,7 +80,7 @@ public class MotorEncoderController {
                 }
             }
         } catch (Exception e) {
-            System.out.println("drive");
+            System.out.println("driveForward");
         }
     }
 
@@ -99,7 +99,10 @@ public class MotorEncoderController {
                     while (motor.getMotor().isBusy() && !emergencyStop) {
                     }
 
-                    motor.getMotor().setPower(0.01);
+                    DcMotor.ZeroPowerBehavior behavior = motor.getMotor().getZeroPowerBehavior();
+                    motor.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    motor.getMotor().setPower(0);
+                    motor.getMotor().setZeroPowerBehavior(behavior);
                     motor.getMotor().setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                     running.remove(motor.getName());
@@ -113,7 +116,7 @@ public class MotorEncoderController {
                 }
             }
         } catch (Exception e) {
-            System.out.println("drive");
+            System.out.println("driveForward");
         }
     }
 

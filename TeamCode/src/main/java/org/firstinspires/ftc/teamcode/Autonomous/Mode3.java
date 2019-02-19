@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
-import org.firstinspires.ftc.teamcode.MotorEncoderController;
 
 @Autonomous(name = "Demo - Bucuresti", group = "Official")
 public class Mode3 extends EasyRobot {
@@ -12,75 +11,79 @@ public class Mode3 extends EasyRobot {
     public void runOpMode() throws InterruptedException {
         initRobot(this);
 
+        getCollectorRotateServo().setPosition(0);
+
         initVuforia();
         initTfod(2);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
 
-        lock();
+//        lock();
 
         waitForStart();
 
-        touchDown();
-        drive(10, 1);
+//        touchDown();
+        driveForward(15, 1);
 
-//        runObjectDetection(2, new ObjectDetected() {
-//            @Override
-//            public void pickup() {
-//                MotorEncoderController.getInstance().drive(getHandMotor(), -20, 0.3, true);
-//                MotorEncoderController.getInstance().waitForMotors(getHandMotor().getName());
-//                getCollectorRotateServo().setPosition(1);
+        runObjectDetection(2, new ObjectDetected() {
+            @Override
+            public void pickup() {
+                drive(getHandMotor(), -20, 0.3, true);
+                waitForMotors(getHandMotor().getName());
+                getCollectorRotateServo().setPosition(1);
 //                getCollectorServo().setPower(1);
-//                MotorEncoderController.getInstance().drive(getHandMotor(), -20, 0.05, true);
-//                MotorEncoderController.getInstance().waitForMotors(getHandMotor().getName());
+                drive(getHandMotor(), -20, 0.05, true);
+                waitForMotors(getHandMotor().getName());
 //                getCollectorServo().setPower(0);
-//                getCollectorRotateServo().setPosition(0.5);
-//            }
-//
-//            @Override
-//            public void onLeft() {
-//                turnTo(0.5, 0);
-//            }
-//
-//            @Override
-//            public void onCenter() {
-//                drive(50, 1);
-//                getCollectorRotateServo().setPosition(1);
-//                getCollectorServo().setPower(1);
-//                drive(30, 0.3);
-//                MotorEncoderController.getInstance().waitForMotors("m1", "m2", "m3", "m4");
-//                getCollectorRotateServo().setPosition(0.5);
-//                getCollectorServo().setPower(0);
-//                drive(-30, 1);
-//            }
-//
-//            @Override
-//            public void onRight() {
-//                turnTo(0.5, 0);
-//            }
-//
-//            @Override
-//            public void loadCargo() {
-//                MotorEncoderController.getInstance().drive(getHandMotor(), 35, 0.3, true);
-//                MotorEncoderController.getInstance().waitForMotors(getHandMotor().getName());
-//                getCollectorRotateServo().setPosition(0);
-//
-//                drive(-20, 1);
-//                turnTo(0.5, -10);
-//                MotorEncoderController.getInstance().drive(getExtendLift(), 10, 0.3, true);
-//                MotorEncoderController.getInstance().waitForMotors(getExtendLift().getName());
-//
-//                getLiftServo1().setPosition(0);
-//                getLiftServo2().setPosition(1);
-//
-//
+                getCollectorRotateServo().setPosition(0.5);
+            }
+
+            @Override
+            public void onLeft() {
+                turnTo(0.3, 0);
+            }
+
+            @Override
+            public void onCenter() {
+                getCollectorRotateServo().setPosition(0.5);
+
+                driveForward(50, 1);
+                getCollectorRotateServo().setPosition(1);
+                getCollectorServo().setPower(1);
+                driveForward(30, 0.3);
+                waitForMotors("m1", "m2", "m3", "m4");
+                getCollectorRotateServo().setPosition(0.5);
+                getCollectorServo().setPower(0);
+                driveForward(-30, 1);
+            }
+
+            @Override
+            public void onRight() {
+                turnTo(0.3, 0);
+            }
+
+            @Override
+            public void loadCargo() {
+                drive(getHandMotor(), 35, 0.3, true);
+                waitForMotors(getHandMotor().getName());
+                getCollectorRotateServo().setPosition(0);
+                sleep(1500);
+                getCollectorRotateServo().setPosition(0.5);
+
+                driveForward(-13, 1);
+                driveTicks(getExtendLift(), 1240, 0.5, true);
+                waitForMotors(getExtendLift().getName());
+
+                getLiftServo1().setPosition(0);
+                getLiftServo2().setPosition(1);
+
+
 //                getLiftServo1().setPosition(0.5);
 //                getLiftServo2().setPosition(0.5);
-//            }
-//        });
+            }
+        });
 
         sleep(20000);
 
-        MotorEncoderController.disable();
         disable();
     }
 
@@ -94,29 +97,29 @@ public class Mode3 extends EasyRobot {
         getExtendLift2().setBrake(false);
         getExtendLift().setBrake(false);
 
-        MotorEncoderController.getInstance().driveTicks(getExtendLift(), 1240, 0.1, true);
-        MotorEncoderController.getInstance().waitForMotors(getExtendLift().getName());
+        driveTicks(getExtendLift(), 1240, 0.1, true);
+        waitForMotors(getExtendLift().getName());
 
         driveWith(0.3, 15, 15, -15, -15);
-        drive(10, 0.3);
+        driveForward(10, 0.3);
         driveWith(0.3, -15, -15, 15, 15);
-        drive(-10, 0.3);
+        driveForward(-10, 0.3);
     }
 
-    public void drive(int distance, double speed) {
-        MotorEncoderController.getInstance().drive(getLeftMotorUp(), -distance, speed, false);
-        MotorEncoderController.getInstance().drive(getRightMotorUp(), distance, speed, false);
-        MotorEncoderController.getInstance().drive(getLeftMotorDown(), -distance, speed, false);
-        MotorEncoderController.getInstance().drive(getRightMotorDown(), distance, speed, false);
-        MotorEncoderController.getInstance().update("m1", "m2", "m3", "m4");
+    public void driveForward(int distance, double speed) {
+        drive(getLeftMotorUp(), -distance, speed, false);
+        drive(getRightMotorUp(), distance, speed, false);
+        drive(getLeftMotorDown(), -distance, speed, false);
+        drive(getRightMotorDown(), distance, speed, false);
+        update("m1", "m2", "m3", "m4");
     }
 
     public void driveWith(double speed, int distanceLeftUp, int distanceRightUp, int distanceLeftDown, int distanceRightDown) {
-        MotorEncoderController.getInstance().drive(getLeftMotorUp(), distanceLeftUp, speed, false);
-        MotorEncoderController.getInstance().drive(getRightMotorUp(), distanceRightUp, speed, false);
-        MotorEncoderController.getInstance().drive(getLeftMotorDown(), distanceLeftDown, speed, false);
-        MotorEncoderController.getInstance().drive(getRightMotorDown(), distanceRightDown, speed, false);
-        MotorEncoderController.getInstance().update("m1", "m2", "m3", "m4");
+        drive(getLeftMotorUp(), distanceLeftUp, speed, false);
+        drive(getRightMotorUp(), distanceRightUp, speed, false);
+        drive(getLeftMotorDown(), distanceLeftDown, speed, false);
+        drive(getRightMotorDown(), distanceRightDown, speed, false);
+        update("m1", "m2", "m3", "m4");
     }
 
 }

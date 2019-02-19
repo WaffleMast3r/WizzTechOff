@@ -28,10 +28,10 @@ public class Mode1 extends LinearOpMode {
 
             @Override
             public void onCenter(int... values) {
-//                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorUp(), 10, 1.0, false);
-//                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
-//                MotorEncoderController.getInstance().drive(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
-//                MotorEncoderController.getInstance().drive(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
+//                MotorEncoderController.getInstance().driveForward(Robot.getInstance().getLeftMotorUp(), 10, 1.0, false);
+//                MotorEncoderController.getInstance().driveForward(Robot.getInstance().getRightMotorUp(), 10, -1.0, false);
+//                MotorEncoderController.getInstance().driveForward(Robot.getInstance().getLeftMotorDown(), 10, 1.0, false);
+//                MotorEncoderController.getInstance().driveForward(Robot.getInstance().getRightMotorDown(), 10, -1.0, false);
 //                MotorEncoderController.getInstance().update("*");
 
                 telemetry.addData("Found", "Center (" + values[0] + ", " + values[1] + ", " + values[2] + ")");

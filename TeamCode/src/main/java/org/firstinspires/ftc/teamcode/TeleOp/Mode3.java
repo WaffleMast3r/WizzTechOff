@@ -49,7 +49,7 @@ public class Mode3 extends EasyRobot {
                 getHandMotor().getMotor().setPower(0);
             }
 
-            if (gamepad1.left_bumper && gamepad1.right_bumper) {
+            if (gamepad1.left_bumper && gamepad1.right_bumper && gamepad1.a) {
 
                 MotorEncoderController.getInstance().driveTicks(getExtendLift(), 0, 1, true);
                 MotorEncoderController.getInstance().driveTicks(getExtendLift2(), 500, 0.3, true);
@@ -58,13 +58,23 @@ public class Mode3 extends EasyRobot {
 
                 getExtendLift().setBrake(true);
                 getExtendLift2().setBrake(true);
-                break;
+                while (opModeIsActive()) {
+                }
+
+                getExtendLift2().setBrake(false);
+                getExtendLift().setBrake(false);
+
+                MotorEncoderController.getInstance().driveTicks(getExtendLift(), 1240, 0.1, true);
+                MotorEncoderController.getInstance().waitForMotors(getExtendLift().getName());
+
+                disable();
+                MotorEncoderController.disable();
             } else if (gamepad1.left_bumper) {
                 MotorEncoderController.getInstance().driveTicks(getExtendLift(), 1240, 1, true);
-                MotorEncoderController.getInstance().waitForMotors(getExtendLift().getName());
+                getExtendLift().getMotor().setPower(0);
             } else if (gamepad1.right_bumper) {
                 MotorEncoderController.getInstance().driveTicks(getExtendLift2(), 0, 1, true);
-                MotorEncoderController.getInstance().waitForMotors(getExtendLift2().getName());
+                getExtendLift2().getMotor().setPower(0);
             }
 
 
@@ -117,9 +127,8 @@ public class Mode3 extends EasyRobot {
 
             if (gamepad2.dpad_down) {
                 getLiftServo1().setPosition(0.5);
-
+                getLiftServo2().setPosition(0.5);
             }
-            getLiftServo2().setPosition(0.5);
 
             if (gamepad2.dpad_left) {
                 getCollectorRotateServo().setPosition(0);
@@ -130,17 +139,5 @@ public class Mode3 extends EasyRobot {
             }
 
         }
-
-        while (opModeIsActive()) {
-        }
-
-        getExtendLift2().setBrake(false);
-        getExtendLift().setBrake(false);
-
-        MotorEncoderController.getInstance().driveTicks(getExtendLift(), 1240, 0.1, true);
-        MotorEncoderController.getInstance().waitForMotors(getExtendLift().getName());
-
-        disable();
-        MotorEncoderController.disable();
     }
 }
