@@ -39,7 +39,7 @@ public abstract class EasyRobot extends LinearOpMode {
     private HardwareMap hardwareMap;
     private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, handMotor, extendLift, extendLift2;
     private CRServo collectorServo;
-    private Servo collectorRotateServo, paletaServo1, paletaServo2, liftServo1, liftServo2;
+    private Servo collectorRotateServo, liftServo1, liftServo2, sortatorServo1, sortatorServo2, sortator;
     private BNO055IMU imu;
     private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
@@ -48,11 +48,11 @@ public abstract class EasyRobot extends LinearOpMode {
     private VuforiaTrackables targetsRoverRuckus;
     private OpenGLMatrix lastLocation;
     private boolean targetVisible;
-    private int TICKS_PER_REVOLUTION = 575; // Tetrix 1440 AndyMark 1100
+    private int TICKS_PER_REVOLUTION = 575; // Tetrix 1440 AndyMark 1120
     private double COUNTS_PER_INCH = TICKS_PER_REVOLUTION / 5;   //16.5 // TODO: 12/1/2018 Change here
     private HashMap<String, Thread> queued = new HashMap<>();
     private HashMap<String, Thread> running = new HashMap<>();
-    private boolean  xemergencyStop = false;
+    private boolean emergencyStop = false;
 
     public EasyRobot() {
     }
@@ -83,10 +83,11 @@ public abstract class EasyRobot extends LinearOpMode {
         collectorServo = opMode.hardwareMap.crservo.get("s1");
         collectorRotateServo = opMode.hardwareMap.servo.get("s2");
 
-        paletaServo1 = opMode.hardwareMap.servo.get("s3");
-        paletaServo2 = opMode.hardwareMap.servo.get("s4");
+        sortatorServo1 = opMode.hardwareMap.servo.get("s3");
+        sortatorServo2 = opMode.hardwareMap.servo.get("s4");
         liftServo1 = opMode.hardwareMap.servo.get("s5");
         liftServo2 = opMode.hardwareMap.servo.get("s6");
+        sortator = opMode.hardwareMap.servo.get("s7");
     }
 
     public void disable() {
@@ -143,7 +144,6 @@ public abstract class EasyRobot extends LinearOpMode {
                 }
                 updatedRecognitions = tf.getUpdatedRecognitions();
             }
-
             boolean found = false;
             for (Recognition recogn : updatedRecognitions) {
                 if (recogn.getLabel().equals("Gold Mineral")) {
@@ -170,7 +170,6 @@ public abstract class EasyRobot extends LinearOpMode {
                     turnTo(0.3, -27);
                 }
             }
-
         }
     }
 
@@ -290,16 +289,43 @@ public abstract class EasyRobot extends LinearOpMode {
                 }
             } else {
                 for (String name : names) {
-                    while (running.get(name) != null) {
+                    while (running.get(name) != null && opMode.opModeIsActive()) {
                     }
                 }
             }
         } else if (names.length > 1) {
             for (String name : names) {
-                while (running.get(name) != null) {
+                while (running.get(name) != null && opMode.opModeIsActive()) {
                 }
             }
         }
+    }
+
+    public boolean areBusyMotors(String... names) {
+        boolean busy = false;
+
+        if (names.length == 1) {
+            if (names[0].equalsIgnoreCase("*") || names[0].equalsIgnoreCase("all")) {
+                if (!running.isEmpty()) {
+                    busy = true;
+                }
+            } else {
+                for (String name : names) {
+                    if (running.get(name) != null) {
+                        busy = true;
+                        break;
+                    }
+                }
+            }
+        } else if (names.length > 1) {
+            for (String name : names) {
+                if (running.get(name) != null) {
+                    busy = true;
+                    break;
+                }
+            }
+        }
+        return busy;
     }
 
     public synchronized void drive(final WizzTechDcMotor motor, final int distance, final double speed, boolean update, String... names) {
@@ -318,7 +344,7 @@ public abstract class EasyRobot extends LinearOpMode {
                     motor.getMotor().setTargetPosition(newPosition);
                     motor.getMotor().setPower(speed);
 
-                    while (motor.getMotor().isBusy() && !emergencyStop) {
+                    while (motor.getMotor().isBusy() && !emergencyStop && opMode.opModeIsActive()) {
                     }
 
                     motor.getMotor().setPower(0.01);
@@ -339,19 +365,20 @@ public abstract class EasyRobot extends LinearOpMode {
         }
     }
 
-    public synchronized void driveTicks(final WizzTechDcMotor motor, final int ticks, final double speed, boolean update, String... names) {
+    public synchronized void driveTicks(final WizzTechDcMotor motor, final int ticks, final double speed, boolean update, final boolean reset, String... names) {
         try {
             queued.put(motor.getName(), new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    if (reset)
+                        motor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     motor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     motor.getMotor().setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
                     motor.getMotor().setTargetPosition(ticks);
                     motor.getMotor().setPower(speed);
 
-                    while (motor.getMotor().isBusy() && !emergencyStop) {
+                    while (motor.getMotor().isBusy() && !emergencyStop && opMode.opModeIsActive()) {
                     }
 
                     DcMotor.ZeroPowerBehavior behavior = motor.getMotor().getZeroPowerBehavior();
@@ -395,10 +422,10 @@ public abstract class EasyRobot extends LinearOpMode {
 
     @SuppressWarnings("deprecation")
     public void emergencyStop() {
+        emergencyStop = true;
         for (String name : running.keySet()) {
             running.remove(name).stop();
         }
-        emergencyStop = true;
     }
 
     public void activateTrackable() {
@@ -499,14 +526,6 @@ public abstract class EasyRobot extends LinearOpMode {
         return extendLift;
     }
 
-    public Servo getPaletaServo1() {
-        return paletaServo1;
-    }
-
-    public Servo getPaletaServo2() {
-        return paletaServo2;
-    }
-
     public Servo getLiftServo1() {
         return liftServo1;
     }
@@ -521,6 +540,18 @@ public abstract class EasyRobot extends LinearOpMode {
 
     public CRServo getCollectorServo() {
         return collectorServo;
+    }
+
+    public Servo getSortatorServo1() {
+        return sortatorServo1;
+    }
+
+    public Servo getSortatorServo2() {
+        return sortatorServo2;
+    }
+
+    public Servo getSortator() {
+        return sortator;
     }
 
     public TeamSide getSide() {

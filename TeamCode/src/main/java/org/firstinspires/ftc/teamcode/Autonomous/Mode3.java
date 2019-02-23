@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
 
-@Autonomous(name = "Demo - Bucuresti", group = "Official")
+@Autonomous(name = "Regional - Timisoara", group = "Official")
 public class Mode3 extends EasyRobot {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,7 +21,11 @@ public class Mode3 extends EasyRobot {
 
         waitForStart();
 
+        getCollectorRotateServo().setPosition(1);
+
 //        touchDown();
+
+        getCollectorRotateServo().setPosition(0.5);
         driveForward(15, 1);
 
         runObjectDetection(2, new ObjectDetected() {
@@ -30,10 +34,10 @@ public class Mode3 extends EasyRobot {
                 drive(getHandMotor(), -20, 0.3, true);
                 waitForMotors(getHandMotor().getName());
                 getCollectorRotateServo().setPosition(1);
-//                getCollectorServo().setPower(1);
+                getCollectorServo().setPower(1);
                 drive(getHandMotor(), -20, 0.05, true);
                 waitForMotors(getHandMotor().getName());
-//                getCollectorServo().setPower(0);
+                getCollectorServo().setPower(0);
                 getCollectorRotateServo().setPosition(0.5);
             }
 
@@ -45,7 +49,7 @@ public class Mode3 extends EasyRobot {
             @Override
             public void onCenter() {
                 getCollectorRotateServo().setPosition(0.5);
-
+                sleep(500);
                 driveForward(50, 1);
                 getCollectorRotateServo().setPosition(1);
                 getCollectorServo().setPower(1);
@@ -70,11 +74,15 @@ public class Mode3 extends EasyRobot {
                 getCollectorRotateServo().setPosition(0.5);
 
                 driveForward(-13, 1);
-                driveTicks(getExtendLift(), 1240, 0.5, true);
-                waitForMotors(getExtendLift().getName());
-
-                getLiftServo1().setPosition(0);
-                getLiftServo2().setPosition(1);
+                waitForMotors("m1", "m2", "m3", "m4");
+//                driveTicks(getExtendLift(), 1240, 0.5, true, true);
+//                waitForMotors(getExtendLift().getName());
+//                getExtendLift().setBrake(true);
+//
+//                getLiftServo1().setPosition(0);
+//                getLiftServo2().setPosition(1);
+//
+//                getExtendLift().setBrake(false);
 
 
 //                getLiftServo1().setPosition(0.5);
@@ -82,8 +90,13 @@ public class Mode3 extends EasyRobot {
             }
         });
 
-        sleep(20000);
+        driveForward(50, 0.8);
+//        drive(getHandMotor(), -40, 0.5, true);
+//        waitForMotors(getHandMotor().getName());
+//        getCollectorRotateServo().setPosition(0.5);
 
+
+        sleep(5000);
         disable();
     }
 
@@ -94,16 +107,21 @@ public class Mode3 extends EasyRobot {
     }
 
     private void touchDown() {
+        getSortatorServo1().setPosition(1);
+        getSortatorServo2().setPosition(1);
         getExtendLift2().setBrake(false);
         getExtendLift().setBrake(false);
 
-        driveTicks(getExtendLift(), 1240, 0.1, true);
+        driveTicks(getExtendLift(), 1240, 0.1, true, false);
         waitForMotors(getExtendLift().getName());
 
         driveWith(0.3, 15, 15, -15, -15);
         driveForward(10, 0.3);
         driveWith(0.3, -15, -15, 15, 15);
         driveForward(-10, 0.3);
+
+        driveTicks(getExtendLift2(), 0, 0.1, true, false);
+        waitForMotors(getExtendLift2().getName());
     }
 
     public void driveForward(int distance, double speed) {
