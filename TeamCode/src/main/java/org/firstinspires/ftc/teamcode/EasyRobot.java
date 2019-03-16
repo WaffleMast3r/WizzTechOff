@@ -146,7 +146,7 @@ public abstract class EasyRobot extends LinearOpMode {
             }
             boolean found = false;
             for (Recognition recogn : updatedRecognitions) {
-                if (recogn.getLabel().equals("Gold Mineral")) {
+                if (recogn.getLabel().equals("Gold Mineral")){  // Add && recogn.getTop()> top_size to check if it is in a certain spot relative to the camera
                     found = true;
                 }
             }
