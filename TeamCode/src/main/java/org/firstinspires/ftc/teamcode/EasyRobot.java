@@ -193,7 +193,6 @@ public abstract class EasyRobot extends LinearOpMode {
                         getLeftMotorDown().getMotor().setPower(-0.3);
                         getRightMotorDown().getMotor().setPower(-0.3);
                     }
-
                     getLeftMotorUp().getMotor().setPower(0);
                     getRightMotorUp().getMotor().setPower(0);
                     getLeftMotorDown().getMotor().setPower(0);
