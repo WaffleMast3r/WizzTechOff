@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
 
-@Autonomous(name = "Regional - Timisoara(down)", group = "Official")
-public class Mode3 extends EasyRobot {
+@Autonomous(name = "Regional - Timisoara(up)", group = "Official")
+public class Mode4 extends EasyRobot {
     @Override
     public void runOpMode() throws InterruptedException {
         initRobot(this);
@@ -17,13 +17,13 @@ public class Mode3 extends EasyRobot {
         initTfod(2);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
 
-//        lock();
+        lock();
 
         waitForStart();
 
         getCollectorRotateServo().setPosition(1);
 
-//        touchDown();
+        touchDown();
 
         getCollectorRotateServo().setPosition(0.5);
         driveForward(15, 1);
@@ -32,6 +32,7 @@ public class Mode3 extends EasyRobot {
             @Override
             public void pickup() {
                 drive(getHandMotor(), -20, 0.3, true);
+
                 waitForMotors(getHandMotor().getName());
                 getCollectorRotateServo().setPosition(1);
                 getCollectorServo().setPower(1);
@@ -64,6 +65,7 @@ public class Mode3 extends EasyRobot {
             public void onRight() {
                 turnTo(0.3, 0);
             }
+
 
             @Override
             public void loadCargo() {
@@ -129,6 +131,7 @@ public class Mode3 extends EasyRobot {
         drive(getRightMotorDown(), distance, speed, false);
         update("m1", "m2", "m3", "m4");
     }
+
 
     public void driveWith(double speed, int distanceLeftUp, int distanceRightUp, int distanceLeftDown, int distanceRightDown) {
         drive(getLeftMotorUp(), distanceLeftUp, speed, false);

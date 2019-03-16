@@ -82,30 +82,19 @@ public class Mode3 extends EasyRobot {
                 getExtendLift2().getMotor().setPower(0);
             }
 
+
             if (gamepad2.y) {
-                //sus
-                getLiftServo1().setPosition(0);
-                getLiftServo2().setPosition(0);
-                getSortatorServo1().setPosition(0);
-                getSortatorServo2().setPosition(0);
-            } else if (gamepad2.a) {
-                getLiftServo1().setPosition(1);
-                getLiftServo2().setPosition(1);
-                getSortatorServo1().setPosition(1);
-                getSortatorServo2().setPosition(1);
-            } else if (gamepad2.x) {
-                // nu stiu
-                getLiftServo1().setPosition(0.5);
-                getLiftServo1().setPosition(0.5);
-                getSortatorServo1().setPosition(0);
-                getSortatorServo2().setPosition(0);
-                sleep( 1000);
-                getLiftServo1().setPosition(0);
-                getLiftServo2().setPosition(0);
-
-
-            } else if (gamepad2.b) {
-                //goleste
+                if (gamepad2.left_bumper && gamepad2.right_bumper) {
+                    getLiftServo1().setPosition(0);
+                    getLiftServo2().setPosition(1);
+                } else if (gamepad2.right_bumper) {
+                    getLiftServo1().setPosition(0);
+                } else if (gamepad2.left_bumper) {
+                    getLiftServo2().setPosition(1);
+                } else {
+                    getLiftServo1().setPosition(1);
+                    getLiftServo2().setPosition(0);
+                }
             }
 
 
