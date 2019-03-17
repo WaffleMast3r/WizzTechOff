@@ -17,19 +17,19 @@ public class Mode2 extends EasyRobot {
 
           initRobot(this);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
-        getHandMotor().getMotor().setPower(0.1f);
+        getLandMotor().getMotor().setPower(0.1f);
         initVuforia();
 //        initTfod();
 
-        //getExtendLift2().getMotor().setPower(0.01);
+        //getExtendLift().getMotor().setPower(0.01);
 
         waitForStart();
 
-        getHandMotor().getMotor().setPower(1.0f);
-        getHandMotor().getMotor().setPower(0.0f);
+        getLandMotor().getMotor().setPower(1.0f);
+        getLandMotor().getMotor().setPower(0.0f);
 
         sleep(5000);
-        getHandMotor().getMotor().setPower(0.0f);
+        getLandMotor().getMotor().setPower(0.0f);
 
         //Drive stanga
         MotorEncoderController.getInstance().drive(getLeftMotorUp(), -15, 0.5, false);

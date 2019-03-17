@@ -11,8 +11,8 @@ public class Test3 extends EasyRobot {
     public void runOpMode() throws InterruptedException {
         initRobot(this);
 
-        getExtendLift2().setBrake(true);
         getExtendLift().setBrake(true);
+        getAxLift().setBrake(true);
         getCollectorRotateServo().setPosition(0);
 
         waitForStart();

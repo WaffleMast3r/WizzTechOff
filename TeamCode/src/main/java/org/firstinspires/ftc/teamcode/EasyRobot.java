@@ -37,11 +37,10 @@ public abstract class EasyRobot extends LinearOpMode {
     private TFObjectDetector[] tfods = new TFObjectDetector[3];
     private LinearOpMode opMode;
     private HardwareMap hardwareMap;
-    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, handMotor, extendLift, extendLift2;
+    private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, landMotor, axLift, extendLift;
     private CRServo collectorServo;
     private Servo collectorRotateServo, liftServo1, liftServo2, sortatorServo1, sortatorServo2, sortator;
     private BNO055IMU imu;
-    private Orientation angles;
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
     private List<VuforiaTrackable> allTrackables;
@@ -66,19 +65,19 @@ public abstract class EasyRobot extends LinearOpMode {
         leftMotorDown = new WizzTechDcMotor(opMode, "m3");
         rightMotorDown = new WizzTechDcMotor(opMode, "m4");
 
-        handMotor = new WizzTechDcMotor(opMode, "m5");
-        extendLift = new WizzTechDcMotor(opMode, "m6");
-        extendLift2 = new WizzTechDcMotor(opMode, "m7");
+        landMotor = new WizzTechDcMotor(opMode, "m5");
+        axLift = new WizzTechDcMotor(opMode, "m6");
+        extendLift = new WizzTechDcMotor(opMode, "m7");
 
-        handMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        landMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        axLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendLift2.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        handMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        landMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        axLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendLift2.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        extendLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        axLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         collectorServo = opMode.hardwareMap.crservo.get("s1");
         collectorRotateServo = opMode.hardwareMap.servo.get("s2");
@@ -517,12 +516,12 @@ public abstract class EasyRobot extends LinearOpMode {
         return rightMotorDown;
     }
 
-    public WizzTechDcMotor getExtendLift2() {
-        return extendLift2;
-    }
-
     public WizzTechDcMotor getExtendLift() {
         return extendLift;
+    }
+
+    public WizzTechDcMotor getAxLift() {
+        return axLift;
     }
 
     public Servo getLiftServo1() {
@@ -561,8 +560,8 @@ public abstract class EasyRobot extends LinearOpMode {
         this.side = side;
     }
 
-    public WizzTechDcMotor getHandMotor() {
-        return handMotor;
+    public WizzTechDcMotor getLandMotor() {
+        return landMotor;
     }
 
     public VuforiaLocalizer getVuforia(int index) {

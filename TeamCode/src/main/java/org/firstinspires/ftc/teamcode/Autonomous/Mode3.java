@@ -31,12 +31,12 @@ public class Mode3 extends EasyRobot {
         runObjectDetection(2, new ObjectDetected() {
             @Override
             public void pickup() {
-                drive(getHandMotor(), -20, 0.3, true);
-                waitForMotors(getHandMotor().getName());
+                drive(getLandMotor(), -20, 0.3, true);
+                waitForMotors(getLandMotor().getName());
                 getCollectorRotateServo().setPosition(1);
                 getCollectorServo().setPower(1);
-                drive(getHandMotor(), -20, 0.05, true);
-                waitForMotors(getHandMotor().getName());
+                drive(getLandMotor(), -20, 0.05, true);
+                waitForMotors(getLandMotor().getName());
                 getCollectorServo().setPower(0);
                 getCollectorRotateServo().setPosition(0.5);
             }
@@ -67,22 +67,22 @@ public class Mode3 extends EasyRobot {
 
             @Override
             public void loadCargo() {
-                drive(getHandMotor(), 35, 0.3, true);
-                waitForMotors(getHandMotor().getName());
+                drive(getLandMotor(), 35, 0.3, true);
+                waitForMotors(getLandMotor().getName());
                 getCollectorRotateServo().setPosition(0);
                 sleep(1500);
                 getCollectorRotateServo().setPosition(0.5);
 
                 driveForward(-13, 1);
                 waitForMotors("m1", "m2", "m3", "m4");
-                driveTicks(getExtendLift(), 1240, 0.5, true, true);
-                waitForMotors(getExtendLift().getName());
-                getExtendLift().setBrake(true);
+                driveTicks(getAxLift(), 1240, 0.5, true, true);
+                waitForMotors(getAxLift().getName());
+                getAxLift().setBrake(true);
 
                 getLiftServo1().setPosition(0);
                 getLiftServo2().setPosition(1);
 
-                getExtendLift().setBrake(false);
+                getAxLift().setBrake(false);
 
 
                 getLiftServo1().setPosition(0.5);
@@ -91,8 +91,8 @@ public class Mode3 extends EasyRobot {
         });
 
 //        driveForward(50, 0.8);
-//        drive(getHandMotor(), -40, 0.5, true);
-//        waitForMotors(getHandMotor().getName());
+//        drive(getLandMotor(), -40, 0.5, true);
+//        waitForMotors(getLandMotor().getName());
 //        getCollectorRotateServo().setPosition(0.5);
 
 
@@ -101,25 +101,25 @@ public class Mode3 extends EasyRobot {
     }
 
     private void lock() {
-        getExtendLift2().setBrake(true);
         getExtendLift().setBrake(true);
+        getAxLift().setBrake(true);
         getCollectorRotateServo().setPosition(0);
     }
 
     private void touchDown() {
-        getExtendLift2().setBrake(false);
         getExtendLift().setBrake(false);
+        getAxLift().setBrake(false);
 
-        driveTicks(getExtendLift(), 1240, 0.1, true, false);
-        waitForMotors(getExtendLift().getName());
+        driveTicks(getAxLift(), 1240, 0.1, true, false);
+        waitForMotors(getAxLift().getName());
 
         driveWith(0.3, 15, 15, -15, -15);
         driveForward(10, 0.3);
         driveWith(0.3, -15, -15, 15, 15);
         driveForward(-10, 0.3);
 
-        driveTicks(getExtendLift2(), 0, 0.1, true, false);
-        waitForMotors(getExtendLift2().getName());
+        driveTicks(getExtendLift(), 0, 0.1, true, false);
+        waitForMotors(getExtendLift().getName());
     }
 
     public void driveForward(int distance, double speed) {
