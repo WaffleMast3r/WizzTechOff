@@ -85,6 +85,8 @@ public class TeleOpMode4 extends EasyRobot {
                     getLandMotor().getMotor().setPower(-1);
                 } else if (gamepad1.dpad_down) {
                     getLandMotor().getMotor().setPower(1);
+                } else {
+                    getLandMotor().getMotor().setPower(0);
                 }
             }
 
