@@ -11,117 +11,71 @@ public class AutoMode5 extends EasyRobot {
     public void runOpMode() throws InterruptedException {
         initRobot(this);
 
-        getCollectorRotateServo().setPosition(0);
-
         initVuforia();
         initTfod(2);
         initGyro(BNO055IMU.AngleUnit.DEGREES);
 
-        lock();
-
         waitForStart();
 
-        getCollectorRotateServo().setPosition(1);
-
         touchDown();
-
-        getCollectorRotateServo().setPosition(0.5);
-        driveForward(15, 1);
 
         runObjectDetection(2, new ObjectDetected() {
             @Override
             public void pickup() {
-                drive(getLandMotor(), -20, 0.3, true);
 
-                waitForMotors(getLandMotor().getName());
-                getCollectorRotateServo().setPosition(1);
-                getCollectorServo().setPower(1);
-                drive(getLandMotor(), -20, 0.05, true);
-                waitForMotors(getLandMotor().getName());
-                getCollectorServo().setPower(0);
-                getCollectorRotateServo().setPosition(0.5);
+                driveTicks(getExtendLift(), 2000, 1.0, true, false);// TODO: Extinde glisiera in pozitia in care poate strange minerale
             }
 
             @Override
             public void onLeft() {
-                turnTo(0.3, 0);
+                turnTo(0.5, -27);
             }
 
             @Override
             public void onCenter() {
-                getCollectorRotateServo().setPosition(0.5);
-                sleep(500);
-                driveForward(50, 1);
-                getCollectorRotateServo().setPosition(1);
-                getCollectorServo().setPower(1);
-                driveForward(30, 0.3);
-                waitForMotors("m1", "m2", "m3", "m4");
-                getCollectorRotateServo().setPosition(0.5);
-                getCollectorServo().setPower(0);
-                driveForward(-30, 1);
+
             }
 
             @Override
             public void onRight() {
-                turnTo(0.3, 0);
-            }
+                turnTo(0.5, 27);
 
+            }
 
             @Override
             public void loadCargo() {
-                drive(getLandMotor(), 35, 0.3, true);
-                waitForMotors(getLandMotor().getName());
-                getCollectorRotateServo().setPosition(0);
-                sleep(1500);
-                getCollectorRotateServo().setPosition(0.5);
-
+                getCollectorServo().setPower(1);
+                driveForward(35,1);
+                waitForMotors("m1", "m2", "m3", "m4");
                 driveForward(-13, 1);
                 waitForMotors("m1", "m2", "m3", "m4");
-                driveTicks(getAxLift(), 1240, 0.5, true, true);
-                waitForMotors(getAxLift().getName());
-                getAxLift().setBrake(true);
-
-                getLiftServo1().setPosition(0);
-                getLiftServo2().setPosition(1);
 
                 getAxLift().setBrake(false);
+                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie 45 grade
+                getAxLift().setBrake(true);
 
+                sleep(2000);
 
-                getLiftServo1().setPosition(0.5);
-                getLiftServo2().setPosition(0.5);
+                getAxLift().setBrake(false);
+                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie sus
+                getAxLift().setBrake(true);
+
             }
         });
 
-//        driveForward(50, 0.8);
-//        drive(getLandMotor(), -40, 0.5, true);
-//        waitForMotors(getLandMotor().getName());
-//        getCollectorRotateServo().setPosition(0.5);
-
-
-        sleep(5000);
+        sleep(20000);
         disable();
     }
 
-    private void lock() {
-        getExtendLift().setBrake(true);
-        getAxLift().setBrake(true);
-        getCollectorRotateServo().setPosition(0);
-    }
-
     private void touchDown() {
-        getExtendLift().setBrake(false);
-        getAxLift().setBrake(false);
+        driveTicks(getLandMotor(),1000 , 1, true, false);
+        waitForMotors(getLandMotor().getName());
 
-        driveTicks(getAxLift(), 1240, 0.1, true, false);
-        waitForMotors(getAxLift().getName());
-
-        driveWith(0.3, 15, 15, -15, -15);
+        driveWidth(0.3, 20, 20, -20, -20);
         driveForward(10, 0.3);
-        driveWith(0.3, -15, -15, 15, 15);
-        driveForward(-10, 0.3);
+        driveWidth(0.3, -20, -20, 20, 20);
 
-        driveTicks(getExtendLift(), 0, 0.1, true, false);
-        waitForMotors(getExtendLift().getName());
+        driveTicks(getLandMotor(),0 , 1, true, false);
     }
 
     public void driveForward(int distance, double speed) {
@@ -133,7 +87,7 @@ public class AutoMode5 extends EasyRobot {
     }
 
 
-    public void driveWith(double speed, int distanceLeftUp, int distanceRightUp, int distanceLeftDown, int distanceRightDown) {
+    public void driveWidth(double speed, int distanceLeftUp, int distanceRightUp, int distanceLeftDown, int distanceRightDown) {
         drive(getLeftMotorUp(), distanceLeftUp, speed, false);
         drive(getRightMotorUp(), distanceRightUp, speed, false);
         drive(getLeftMotorDown(), distanceLeftDown, speed, false);

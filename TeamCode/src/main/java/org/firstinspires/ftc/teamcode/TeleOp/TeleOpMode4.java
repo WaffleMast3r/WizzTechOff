@@ -23,8 +23,8 @@ public class TeleOpMode4 extends EasyRobot {
 
         while (opModeIsActive()) {
 
-            //driver 1
-            if (classic) {
+            //Driver 1
+            if (classic) {      //Mod clasic
                 if (gamepad1.x) {
                     getLeftMotorUp().getMotor().setPower(-0.1);
                     getRightMotorUp().getMotor().setPower(0.1);
@@ -44,7 +44,8 @@ public class TeleOpMode4 extends EasyRobot {
                 } else {
                     getLandMotor().getMotor().setPower(0);
                 }
-            } else {
+
+            } else {            //Mod nou
                 if (gamepad1.right_trigger > 0) {
                     getLeftMotorUp().getMotor().setPower(-gamepad1.right_trigger);
                     getRightMotorUp().getMotor().setPower(gamepad1.right_trigger);
@@ -90,11 +91,13 @@ public class TeleOpMode4 extends EasyRobot {
                 }
             }
 
-            //driver 2
+            //Driver 2
             if (gamepad2.a) {
                 getCollectorServo().setPower(1);
             } else if (gamepad2.b) {
                 getCollectorServo().setPower(-1);
+            } else {
+                getCollectorServo().setPower(0);
             }
 
             if (gamepad2.right_bumper) {
@@ -111,6 +114,7 @@ public class TeleOpMode4 extends EasyRobot {
                 }
             }
 
+            //Axlift este motorul care roteste bratul ce include sortatorul
             if (gamepad2.dpad_down) {
                 getAxLift().setBrake(false);
                 driveTicks(getAxLift(), 0, 1.0, true, false);
@@ -124,7 +128,6 @@ public class TeleOpMode4 extends EasyRobot {
                 driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie sus
                 getAxLift().setBrake(true);
             }
-
         }
     }
 }

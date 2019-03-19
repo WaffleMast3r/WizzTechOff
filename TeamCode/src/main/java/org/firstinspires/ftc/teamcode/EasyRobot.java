@@ -39,7 +39,8 @@ public abstract class EasyRobot extends LinearOpMode {
     private HardwareMap hardwareMap;
     private WizzTechDcMotor leftMotorUp, rightMotorUp, leftMotorDown, rightMotorDown, landMotor, axLift, extendLift;
     private CRServo collectorServo;
-    private Servo collectorRotateServo, liftServo1, liftServo2, sortatorServo1, sortatorServo2, sortator;
+    private Servo teamMarker, cameraServo;
+    private Servo collectorRotateServo, liftServo1, liftServo2, sortatorServo1, sortatorServo2, sortator; // TODO: delete dependencies
     private BNO055IMU imu;
     private TeamSide side = TeamSide.UNKNOWN;
     private VuforiaLocalizer[] cams = new VuforiaLocalizer[3];
@@ -80,13 +81,18 @@ public abstract class EasyRobot extends LinearOpMode {
         axLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         collectorServo = opMode.hardwareMap.crservo.get("s1");
-        collectorRotateServo = opMode.hardwareMap.servo.get("s2");
+        teamMarker = opMode.hardwareMap.servo.get("s2");
+        cameraServo = opMode.hardwareMap.servo.get("s3");
 
-        sortatorServo1 = opMode.hardwareMap.servo.get("s3");
-        sortatorServo2 = opMode.hardwareMap.servo.get("s4");
-        liftServo1 = opMode.hardwareMap.servo.get("s5");
-        liftServo2 = opMode.hardwareMap.servo.get("s6");
-        sortator = opMode.hardwareMap.servo.get("s7");
+
+//        // TODO: Deprecated - remove with all dependencies
+//        sortatorServo2 = opMode.hardwareMap.servo.get("s4");
+//        liftServo1 = opMode.hardwareMap.servo.get("s5");
+//        liftServo2 = opMode.hardwareMap.servo.get("s6");
+//        sortator = opMode.hardwareMap.servo.get("s7");
+//        collectorRotateServo = opMode.hardwareMap.servo.get("s8");
+//        sortatorServo1 = opMode.hardwareMap.servo.get("s9");
+
     }
 
     public void disable() {
@@ -164,9 +170,9 @@ public abstract class EasyRobot extends LinearOpMode {
                 return;
             } else {
                 if (i == 0) {
-                    turnTo(0.3, 27);
+                    cameraServo.setPosition(0);        // TODO: check positions for camera ROTATION
                 } else {
-                    turnTo(0.3, -27);
+                    cameraServo.setPosition(1);
                 }
             }
         }
@@ -534,11 +540,16 @@ public abstract class EasyRobot extends LinearOpMode {
 
     public Servo getCollectorRotateServo() {
         return collectorRotateServo;
+
     }
 
     public CRServo getCollectorServo() {
         return collectorServo;
     }
+
+    public Servo getTeamMarker() { return teamMarker; }
+
+    public Servo getCameraServo() { return cameraServo; }
 
     public Servo getSortatorServo1() {
         return sortatorServo1;
