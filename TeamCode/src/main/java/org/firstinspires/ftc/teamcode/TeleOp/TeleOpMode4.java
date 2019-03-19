@@ -17,12 +17,11 @@ public class TeleOpMode4 extends EasyRobot {
 
         waitForStart();
 
+        while (!gamepad1.dpad_left && !gamepad1.dpad_right && opModeIsActive()) {
+            classic = gamepad1.dpad_left;
+        }
+
         while (opModeIsActive()) {
-
-
-            while (!gamepad1.dpad_left && !gamepad1.dpad_right) {
-                classic = gamepad1.dpad_left;
-            }
 
             //driver 1
             if (classic) {
@@ -66,6 +65,18 @@ public class TeleOpMode4 extends EasyRobot {
                 } else if (gamepad1.left_bumper) {
                     getLeftMotorUp().getMotor().setPower(1);
                     getRightMotorUp().getMotor().setPower(1);
+                    getLeftMotorDown().getMotor().setPower(1);
+                    getRightMotorDown().getMotor().setPower(1);
+                }
+
+                if (gamepad1.dpad_left){
+                    getLeftMotorUp().getMotor().setPower(1);
+                    getRightMotorUp().getMotor().setPower(1);
+                    getLeftMotorDown().getMotor().setPower(-1);
+                    getRightMotorDown().getMotor().setPower(-1);
+                }else if (gamepad1.dpad_right){
+                    getLeftMotorUp().getMotor().setPower(-1);
+                    getRightMotorUp().getMotor().setPower(-1);
                     getLeftMotorDown().getMotor().setPower(1);
                     getRightMotorDown().getMotor().setPower(1);
                 }
