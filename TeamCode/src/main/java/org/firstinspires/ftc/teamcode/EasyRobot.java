@@ -61,28 +61,28 @@ public abstract class EasyRobot extends LinearOpMode {
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
 
-        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
-        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
-        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
-        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
+//        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
+//        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
+//        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
+//        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
 
-        landMotor = new WizzTechDcMotor(opMode, "m5");
-        axLift = new WizzTechDcMotor(opMode, "m6");
-        extendLift = new WizzTechDcMotor(opMode, "m7");
+//        landMotor = new WizzTechDcMotor(opMode, "m5");
+        axLift = new WizzTechDcMotor(opMode, "m1");
+//        extendLift = new WizzTechDcMotor(opMode, "m7");
 
-        landMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        landMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         axLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        landMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        landMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         axLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         axLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        collectorServo = opMode.hardwareMap.crservo.get("s1");
-        teamMarker = opMode.hardwareMap.servo.get("s2");
-        cameraServo = opMode.hardwareMap.servo.get("s3");
+//        collectorServo = opMode.hardwareMap.crservo.get("s1");
+//        teamMarker = opMode.hardwareMap.servo.get("s2");
+//        cameraServo = opMode.hardwareMap.servo.get("s3");
 
 
 //        // TODO: Deprecated - remove with all dependencies

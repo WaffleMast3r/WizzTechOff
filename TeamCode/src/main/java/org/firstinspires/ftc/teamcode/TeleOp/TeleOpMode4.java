@@ -121,11 +121,11 @@ public class TeleOpMode4 extends EasyRobot {
                 getAxLift().setBrake(true);
             } else if (gamepad2.dpad_up) {
                 getAxLift().setBrake(false);
-                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie 45 grade
+                driveTicks(getAxLift(), -221, 1.0, true, false);
                 getAxLift().setBrake(true);
             } else if (gamepad2.y){
                 getAxLift().setBrake(false);
-                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie sus
+                driveTicks(getAxLift(), -371, 1.0, true, false);
                 getAxLift().setBrake(true);
             }
         }
