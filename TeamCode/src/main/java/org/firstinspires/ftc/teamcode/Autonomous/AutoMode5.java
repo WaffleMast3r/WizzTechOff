@@ -22,8 +22,8 @@ public class AutoMode5 extends EasyRobot {
         runObjectDetection(2, new ObjectDetected() {
             @Override
             public void pickup() {
-
-                driveTicks(getExtendLift(), 2000, 1.0, true, false);// TODO: Extinde glisiera in pozitia in care poate strange minerale
+//
+//                driveTicks(getExtendLift(), 2000, 1.0, true, false);// TODO: Extinde glisiera in pozitia in care poate strange minerale
             }
 
             @Override
@@ -39,26 +39,29 @@ public class AutoMode5 extends EasyRobot {
             @Override
             public void onRight() {
                 turnTo(0.5, 27);
-
             }
 
             @Override
             public void loadCargo() {
                 getCollectorServo().setPower(1);
-                driveForward(35,1);
+                driveForward(45,0.8);
                 waitForMotors("m1", "m2", "m3", "m4");
-                driveForward(-13, 1);
+                driveForward(15,0.5);
                 waitForMotors("m1", "m2", "m3", "m4");
-
-                getAxLift().setBrake(false);
-                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie 45 grade
-                getAxLift().setBrake(true);
-
-                sleep(2000);
-
-                getAxLift().setBrake(false);
-                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie sus
-                getAxLift().setBrake(true);
+                getTeamMarker().setPosition(1);
+                sleep(4000);
+                driveForward(-60, 0.8);
+                waitForMotors("m1", "m2", "m3", "m4");
+//
+//                getAxLift().setBrake(false);
+//                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie 45 grade
+//                getAxLift().setBrake(true);
+//
+//                sleep(2000);
+//
+//                getAxLift().setBrake(false);
+//                driveTicks(getAxLift(), 1000, 1.0, true, false);// TODO: 3/16/2019 pozitie sus
+//                getAxLift().setBrake(true);
 
             }
         });
