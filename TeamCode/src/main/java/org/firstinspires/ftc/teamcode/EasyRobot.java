@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -61,28 +62,29 @@ public abstract class EasyRobot extends LinearOpMode {
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
 
-//        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
-//        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
-//        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
-//        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
+        leftMotorUp = new WizzTechDcMotor(opMode, "m1");
+        rightMotorUp = new WizzTechDcMotor(opMode, "m2");
+        leftMotorDown = new WizzTechDcMotor(opMode, "m3");
+        rightMotorDown = new WizzTechDcMotor(opMode, "m4");
 
-//        landMotor = new WizzTechDcMotor(opMode, "m5");
-        axLift = new WizzTechDcMotor(opMode, "m1");
-//        extendLift = new WizzTechDcMotor(opMode, "m7");
+        landMotor = new WizzTechDcMotor(opMode, "m5");
+        axLift = new WizzTechDcMotor(opMode, "m6");
+        extendLift = new WizzTechDcMotor(opMode, "m7");
 
-//        landMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        landMotor.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         axLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extendLift.getMotor().setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-//        landMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        landMotor.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         axLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extendLift.getMotor().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         axLift.getMotor().setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        collectorServo = opMode.hardwareMap.crservo.get("s1");
-//        teamMarker = opMode.hardwareMap.servo.get("s2");
-//        cameraServo = opMode.hardwareMap.servo.get("s3");
+        collectorServo = opMode.hardwareMap.crservo.get("s1");
+        teamMarker = opMode.hardwareMap.servo.get("s2");
+        cameraServo = opMode.hardwareMap.servo.get("s3");
 
 
 //        // TODO: Deprecated - remove with all dependencies
@@ -151,7 +153,7 @@ public abstract class EasyRobot extends LinearOpMode {
             }
             boolean found = false;
             for (Recognition recogn : updatedRecognitions) {
-                if (recogn.getLabel().equals("Gold Mineral")){  // Add && recogn.getTop()> top_size to check if it is in a certain spot relative to the camera
+                if (recogn.getLabel().equals("Gold Mineral") || isStopRequested()){  // Add && recogn.getTop()> top_size to check if it is in a certain spot relative to the camera
                     found = true;
                 }
             }
@@ -170,9 +172,9 @@ public abstract class EasyRobot extends LinearOpMode {
                 return;
             } else {
                 if (i == 0) {
-                    cameraServo.setPosition(0);        // TODO: check positions for camera ROTATION
+                    getCameraServo().setPosition(1);        // TODO: check positions for camera ROTATION
                 } else {
-                    cameraServo.setPosition(1);
+                    getCameraServo().setPosition(0);
                 }
             }
         }

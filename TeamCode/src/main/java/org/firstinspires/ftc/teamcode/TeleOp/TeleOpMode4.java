@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.EasyRobot;
@@ -26,10 +27,10 @@ public class TeleOpMode4 extends EasyRobot {
             //Driver 1
             if (classic) {      //Mod clasic
                 if (gamepad1.x) {
-                    getLeftMotorUp().getMotor().setPower(-0.1);
-                    getRightMotorUp().getMotor().setPower(0.1);
-                    getLeftMotorDown().getMotor().setPower(0.1);
-                    getRightMotorDown().getMotor().setPower(-0.1);
+                    getLeftMotorUp().getMotor().setPower(-0.1);     //-1
+                    getRightMotorUp().getMotor().setPower(0.1);     //1
+                    getLeftMotorDown().getMotor().setPower(0.1);    //1
+                    getRightMotorDown().getMotor().setPower(-0.1);  //-1
                 } else {
                     getLeftMotorUp().getMotor().setPower(Range.clip(-gamepad1.left_stick_x + gamepad1.left_stick_y - gamepad1.right_stick_x, -1, 1));
                     getRightMotorUp().getMotor().setPower(Range.clip(-gamepad1.left_stick_x - gamepad1.left_stick_y - gamepad1.right_stick_x, -1, 1));
@@ -70,12 +71,12 @@ public class TeleOpMode4 extends EasyRobot {
                     getRightMotorDown().getMotor().setPower(1);
                 }
 
-                if (gamepad1.dpad_left){
+                if (gamepad1.dpad_left) {
                     getLeftMotorUp().getMotor().setPower(1);
                     getRightMotorUp().getMotor().setPower(1);
                     getLeftMotorDown().getMotor().setPower(-1);
                     getRightMotorDown().getMotor().setPower(-1);
-                }else if (gamepad1.dpad_right){
+                } else if (gamepad1.dpad_right) {
                     getLeftMotorUp().getMotor().setPower(-1);
                     getRightMotorUp().getMotor().setPower(-1);
                     getLeftMotorDown().getMotor().setPower(1);
@@ -100,34 +101,47 @@ public class TeleOpMode4 extends EasyRobot {
                 getCollectorServo().setPower(0);
             }
 
+
+//            getExtendLift().getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
             if (gamepad2.right_bumper) {
-                if (getExtendLift().getMotor().getCurrentPosition() < 1000) { // TODO: 3/16/2019 change ticks
-                    getExtendLift().getMotor().setPower(1);// TODO: 3/16/2019 change direction
+                if (getExtendLift().getMotor().getCurrentPosition() < 1200) {
+                    getExtendLift().getMotor().setPower(1);
                 } else {
                     getExtendLift().getMotor().setPower(0);
                 }
             } else if (gamepad2.left_bumper) {
                 if (getExtendLift().getMotor().getCurrentPosition() > 0) {
-                    getExtendLift().getMotor().setPower(-1);// TODO: 3/16/2019 change direction
+                    getExtendLift().getMotor().setPower(-1);
                 } else {
                     getExtendLift().getMotor().setPower(0);
                 }
-            }
-
+            } else getExtendLift().getMotor().setPower(0);
+            telemetry.addData("1", "extendlft %d", getExtendLift().getMotor().getCurrentPosition());
+            telemetry.update();
             //Axlift este motorul care roteste bratul ce include sortatorul
-            if (gamepad2.dpad_down) {
-                getAxLift().setBrake(false);
-                driveTicks(getAxLift(), 0, 1.0, true, false);
-                getAxLift().setBrake(true);
-            } else if (gamepad2.dpad_up) {
-                getAxLift().setBrake(false);
-                driveTicks(getAxLift(), -221, 1.0, true, false);
-                getAxLift().setBrake(true);
-            } else if (gamepad2.y){
-                getAxLift().setBrake(false);
-                driveTicks(getAxLift(), -371, 1.0, true, false);
-                getAxLift().setBrake(true);
-            }
+            getAxLift().getMotor().setDirection(DcMotorSimple.Direction.REVERSE);
+//            if (gamepad2.dpad_down) {       //TODO: After final, make the brakes work
+////                getAxLift().setBrake(false);
+//                driveTicks(getAxLift(), 0, 0.5, true, false);
+//                //getAxLift().setBrake(true);
+//                getAxLift().getMotor().setPower(0);
+//            } else if (gamepad2.dpad_up) {
+////                getAxLift().setBrake(false);
+//                driveTicks(getAxLift(), -221, 1, true, false);
+//                //getAxLift().setBrake(true);
+//                getAxLift().getMotor().setPower(0);
+//            } else if (gamepad2.y){
+////                getAxLift().setBrake(false);
+//                driveTicks(getAxLift(), -371, 1, true, false);
+//                //getAxLift().setBrake(true);
+//                getAxLift().getMotor().setPower(0);
+//            }
+            if(gamepad2.dpad_down)
+                getAxLift().getMotor().setPower(-1);
+            else if(gamepad2.dpad_up)
+                getAxLift().getMotor().setPower(1);
+            else
+                getAxLift().getMotor().setPower(0);
         }
     }
 }

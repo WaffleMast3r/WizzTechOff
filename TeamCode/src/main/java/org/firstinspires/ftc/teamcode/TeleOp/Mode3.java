@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.EasyRobot;
 import org.firstinspires.ftc.teamcode.MotorEncoderController;
 
 
-@TeleOp(name = "TeleOp - Bucuresti", group = "Official")
+@TeleOp(name = "(nu asta) TeleOp - Bucuresti", group = "Official")
 public class Mode3 extends EasyRobot {
 
 
